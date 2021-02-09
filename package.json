@@ -1,0 +1,71 @@
+{
+  "name": "minutelabsio-boilerplate",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "deploy": "sh deploy.sh"
+  },
+  "dependencies": {
+    "@mdi/font": "^4.1.95",
+    "@tweenjs/tween.js": "^18.5.0",
+    "babel-plugin-component": "^1.1.1",
+    "buefy": "^0.8.2",
+    "bulma": "^0.7.1",
+    "lodash": "^4.17.10",
+    "vue": "^2.5.17",
+    "vue-analytics": "^5.17.2",
+    "vue-router": "^3.0.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.2.0",
+    "@vue/cli-plugin-eslint": "^3.2.0",
+    "@vue/cli-service": "^3.2.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^6.2.1",
+    "eslint-plugin-vue": "^5.0.0-0",
+    "json-loader": "^0.5.7",
+    "pug": "^2.0.3",
+    "pug-plain-loader": "^1.0.0",
+    "sass": "^1.22.10",
+    "sass-loader": "^7.3.1",
+    "vue-template-compiler": "^2.6.10",
+    "webfontloader": "^1.6.28"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {
+      "generator-star-spacing": "off",
+      "comma-style": [
+        2,
+        "first"
+      ],
+      "space-in-parens": 0,
+      "space-before-blocks": 0,
+      "padded-blocks": 0,
+      "space-before-function-paren": 0
+    },
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
