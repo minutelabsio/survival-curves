@@ -37,7 +37,6 @@ a
   font-size: 18px
   height: 100%
   overflow: auto
-  background-color: rgba(0, 0, 0, 0.5)
 
 .inner
   min-height: 100%

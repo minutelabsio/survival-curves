@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-REPO="flight-speed.git"
+REPO="survival-curves.git"
 
 # abort on errors
 set -e

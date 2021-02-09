@@ -16,25 +16,19 @@ module.exports = {
     }
     , plugins: [
 
-  	]
+    ]
     , output: {
       globalObject: 'this'
     }
     , module: {
       rules: [
-        {
-          test: /\.ya?ml$/,
-          use: [
-            'json-loader'
-          ]
-        }
-      //   , {
-      //     test: /\.js$/
-      //     , use: [
-      //       'comlink-loader'
-      //     ]
-      //     , include: [ path.resolve(__dirname, 'src/workers') ]
-      //   }
+        //   , {
+        //     test: /\.js$/
+        //     , use: [
+        //       'comlink-loader'
+        //     ]
+        //     , include: [ path.resolve(__dirname, 'src/workers') ]
+        //   }
       ]
     }
   }
@@ -42,7 +36,7 @@ module.exports = {
     loaderOptions: {
       // pass options to sass-loader
       sass: {
-        data: `@import '@/styles/_variables.scss'`
+        additionalData: "@import '@/styles/_variables';"
       }
     }
   }
