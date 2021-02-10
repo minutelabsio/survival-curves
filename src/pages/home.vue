@@ -3,13 +3,16 @@
   .container
     .section
       StackedBarChart(:series="series", :xvalues="xvalues", :domain="domain")
+      p Life Expectancy: {{ lifeExpectancy }}
+      p Life Expectancy: {{ lifeExpectancy2 }}
 </template>
 
 <script>
 import _times from 'lodash/times'
 import StackedBarChart from '@/components/StackedBarChart'
 
-const testArray = [10, 9, 8, 4, 3, 2, 1, 1, 1, 0]
+const N = 24
+const testArray = [N, 10, 8, 4, 3, 2, 1, 1, 1, 0]
 
 export default {
   name: 'Home'
@@ -22,17 +25,19 @@ export default {
     , series: [
       {
         values: testArray
-        , color: 'green'
+        , color: '#519677'
       }
       , {
         values: testArray.map((v, i) => (testArray[i - 1] | 0) - v)
-        , color: 'red'
+        , color: 'tomato'
       }
       , {
-        values: testArray.map((v, i) => 10 - testArray[i - 1] | 0)
-        , color: 'grey'
+        values: testArray.map((v, i) => N - testArray[i - 1] | 0)
+        , color: 'lightgrey'
       }
     ]
+    , lifeExpectancy: testArray.reduce((a, v) => a + v, 0) / N
+    , lifeExpectancy2: testArray.map((v, i) => (testArray[i - 1] | 0) - v).map((v, i) => v * i).reduce((a, v) => a + v, 0) / N
   })
 }
 </script>
