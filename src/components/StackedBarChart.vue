@@ -1,10 +1,18 @@
 <template lang="pug">
 .barchart
-  svg(ref="svg", :width="chartWidth", :height="chartHeight")
+  svg.chart(ref="svg", :width="chartWidth", :height="chartHeight")
     //- along the x direction
     g(v-for="bar in bars", :transform="`translate(${bar.x}, 0) scale(1, 1)`")
       //- each stack
       rect(v-for="layer in bar.layers", v-bind="layer")
+  svg.yaxis.no-events(ref="yaxis", width="100", :height="chartHeight + 30")
+    g(v-for="tick in yticks", :transform="`translate(100, ${yscale(tick) + 15})`")
+      text(text-anchor="end", dominant-baseline="middle", x="-6", y="1.5") {{ytickFormat(tick)}}
+      line.major(x1="-4", x2="0", y1="0", y2="0")
+  svg.xaxis(ref="xaxis", :width="chartWidth", height="20")
+    g(v-for="tick in xticks", :transform="`translate(${xscale(tick)}, 0)`")
+      text(text-anchor="middle", y="18", :x="barWidth / 2") {{tick}}
+      line.major(:x1="barWidth / 2", :x2="barWidth / 2", y1="0", y2="4")
 </template>
 
 <script>
@@ -24,13 +32,17 @@ export default {
       type: Number
       , default: 16/9
     }
+    , tickFormat: {
+      type: String
+      , default: '.2f'
+    }
+    , margin: {
+      type: Number
+      , default: 6
+    }
     , barMargin: {
       type: Number
       , default: 0.3
-    }
-    , domain: {
-      type: Array
-      , default: () => [0, 1]
     }
     , range: {
       type: Array
@@ -50,50 +62,60 @@ export default {
     chartWidth(){ return this.width }
     , chartHeight(){
       if (this.height){ return this.height }
-      else { return this.width / this.aspect }
+      else { return Math.round(this.width / this.aspect) }
     }
     , xscale(){
       return scaleBand()
         .domain(this.xvalues)
-        .range([0, this.chartWidth])
+        .range([this.margin - 1, (this.chartWidth - this.margin) | 0])
         .paddingInner(this.barMargin)
-      // return scaleLinear()
-      //   .domain(this.domain)
-      //   .range([0, this.chartWidth + this.barMargin])
+    }
+    , xticks(){
+      return scaleLinear()
+        .domain(this.xvalues)
+        .range([this.margin - 1, (this.chartWidth - this.margin) | 0])
+        .ticks()
+    }
+    , visibleSeries(){
+      return this.series.filter(s => s.active)
     }
     , yscale(){
       let domain = this.range
       if (!domain){
         let maxY = this.xvalues.reduce((maxY, x, i) => {
-          let sum = this.series.map(s => s.values[i]).reduce((s, v) => s + v, 0)
+          let sum = this.visibleSeries.map(s => s.values[i]).reduce((s, v) => s + v, 0)
           return Math.max(sum, maxY)
         }, 0)
         domain = [0, maxY]
       }
       return scaleLinear()
         .domain(domain)
-        .range([this.chartHeight, 0])
+        .range([this.chartHeight, this.margin - 1])
     }
+    , yticks(){ return this.yscale.ticks(10) }
+    , ytickFormat(){ return this.yscale.tickFormat(10, this.tickFormat) }
     , barWidth(){
       return this.xscale.bandwidth()
-      // const n = this.xvalues.filter(x => x >= this.domain[0] && x <= this.domain[1] ).length
-      // return this.chartWidth / n - this.barMargin
     }
     , bars(){
       const $x = this.xscale
       const $y = this.yscale
       const barWidth = this.barWidth
+      const barMargin = this.barMargin
 
       return this.xvalues.map((x, i) => {
         let y = 0
-        let layers = this.series.map(s => {
+        let layers = this.visibleSeries.map(s => {
           let h = s.values[i]
           y += h
           return {
-            width: barWidth
+            width: barWidth + (s.gapless ? barMargin * barWidth : 0)
             , y: $y(y)
             , height: $y(0) - $y(h)
             , fill: s.color
+            , x: s.gapless ? -barMargin * barWidth : 0
+            , stroke: s.color
+            , 'stroke-width': 0.6
           }
         })
 
@@ -109,7 +131,19 @@ export default {
 
 <style lang="sass" scoped>
 .barchart
+  position: relative
   display: flex
-svg
-  outline: 1px solid red
+  flex-direction: column
+svg.chart
+  border: 1px solid lighten($sand, 30)
+  border-radius: 3px 3px 3px 0
+.major
+  stroke: lighten($sand, 30)
+.yaxis
+  position: absolute
+  top: -15px
+  left: -100px
+  // outline: 1px solid red
+text
+  fill: $sand
 </style>

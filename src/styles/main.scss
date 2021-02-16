@@ -1,13 +1,10 @@
 ;
 // Common
-// @import "~bulmaswatch/solar/_variables";
+@import "~bulma/sass/utilities/_all";
 @import "./_variables";
 @import "./_fonts";
-@import "~bulma/sass/utilities/initial-variables";
-@import "~buefy/src/scss/utils/_all";
-@import "~bulma/bulma";
+@import "~bulma";
 @import "~buefy/src/scss/buefy";
-// @import "~bulmaswatch/solar/_overrides";
 
 * > * {
   box-sizing: border-box;
@@ -44,8 +41,13 @@ a:hover {
 
 .select select {
   background-color: $background;
-  border-color: lighten($background, 10);
+  border-color: mix($background, $text, 80);
   color: $text;
+}
+
+.b-checkbox.checkbox input[type=checkbox]:focus:checked + .check,
+.b-checkbox.checkbox input[type=checkbox]:focus + .check {
+  box-shadow: none;
 }
 
 .heading,

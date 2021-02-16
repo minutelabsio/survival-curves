@@ -14,28 +14,39 @@ $white-ter:    hsl(0, 0%, 96%) !default;
 $white-bis:    hsl(0, 0%, 98%) !default;
 $white:        hsl(0, 0%, 100%) !default;
 
-$orange:       hsl(30, 85%, 58%) !default;
-$yellow:       hsl(47, 78%, 41%) !default;
-$green:        hsl(90, 100%, 25%) !default;
-$turquoise:    hsl(171, 94%, 45%) !default;
-$cyan:         hsl(196, 100%, 50%) !default;
-$blue:         hsl(210, 79%, 38%) !default;
-$purple:       hsl(315, 69%, 30%) !default;
-$red:          hsl(3, 80%, 55%) !default;
+$red: #d20f18;
+$crimson: #640302;
+$blue: #1f698e;
+$cyan: #07C7FB;
+$green: #b7d65a;
+$lime: #97F61B;
+$darkGreen: #246B26;
+$orange: #f47e18;
+$yellow: #FDDE3B;
+$violet: #c86f87;
+$seafoam: #1cc1aa;
+$cream: #EEEDD6;
+$ivory: #FFFDFC;
+$pink: #e71376;
+$brown: #23070C;
+$lightBrown: #643D37;
+$sand: #615c45;
+$grey: #5f5e55;
 
-$primary: $blue;
-$link:    $blue;
-$info:    $cyan;
-$success: $green;
+
+$primary: darken($cyan, 12);
+$link:    $primary;
+$info:    darken($blue, 4);
+$success: $darkGreen;
 $warning: $yellow;
 $danger:  $red;
-$background: $white-ter;
-$text: $black;
-
+$background: $ivory;
+$text: $brown;
+$light: $grey-dark;
 // Typography
 
 $family-sans-serif: 'Source Sans Pro', BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !default;
-$family-monospace: 'latin-modern-mono', monospace !default;
+$family-monospace: latin-modern-mono, monospace !default;
 $render-mode: optimizeLegibility !default;
 
 $size-1: 3rem !default;
@@ -79,3 +90,4 @@ $speed: 86ms !default;
 // Flags
 
 $variable-columns: true !default;
+$body-size: 18px;
