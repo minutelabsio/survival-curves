@@ -13,6 +13,8 @@
     g(v-for="tick in xticks", :transform="`translate(${xscale(tick)}, 0)`")
       text(text-anchor="middle", y="18", :x="barWidth / 2") {{tick}}
       line.major(:x1="barWidth / 2", :x2="barWidth / 2", y1="0", y2="4")
+  .under
+    slot(name="under", v-bind:xscale="xscaleLinear", v-bind:yscale="yscale")
 </template>
 
 <script>
@@ -70,14 +72,17 @@ export default {
         .range([this.margin - 1, (this.chartWidth - this.margin) | 0])
         .paddingInner(this.barMargin)
     }
-    , xticks(){
+    , xscaleLinear(){
+      let xscale = this.xscale
       return scaleLinear()
-        .domain(this.xvalues)
-        .range([this.margin - 1, (this.chartWidth - this.margin) | 0])
-        .ticks()
+        .domain([this.xvalues[0], this.xvalues[this.xvalues.length - 1]])
+        .range([this.barWidth / 2, xscale(this.xvalues[this.xvalues.length - 1]) + this.barWidth / 2])
+    }
+    , xticks(){
+      return this.xscaleLinear.ticks()
     }
     , visibleSeries(){
-      return this.series.filter(s => s.active)
+      return this.series.filter(s => s.active !== false)
     }
     , yscale(){
       let domain = this.range

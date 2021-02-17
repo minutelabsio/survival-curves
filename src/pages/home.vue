@@ -2,16 +2,50 @@
 .home
   .container
     .section
-      p Expected age of Death: {{ longevityStats.expectation }}
-      p Expected age of Death after Childhood: {{ longevityStats.afterChildhood }}
-      p Maximum age: {{ longevityStats.max }}
-      StackedBarChart.chart(
-        :width="1280",
-        :series="series",
-        :xvalues="xvalues",
-        :barMargin="0.1",
-        :tick-format="showPercent ? '%' : null"
-      )
+      .columns
+        .column.is-half
+          p Expected age of Death: {{ longevityStats.expectation }}
+          p Expected age of Death after Childhood: {{ longevityStats.afterChildhood }}
+          p Maximum age: {{ longevityStats.max }}
+        .column.is-half
+          p Childhood:
+            b-tag(type="is-primary") {{ qualitativeRatings.childhoodDanger }}
+          p Adolescence:
+            b-tag(type="is-primary") {{ qualitativeRatings.midlifeQuality }}
+          p Maximum Longevity:
+            b-tag(type="is-primary") {{ qualitativeRatings.maxLifetime }}
+
+      .columns
+        .column
+          h2.is-size-4.heading Survival / Death
+          p Starting with an initial population, how many survive and die each year?
+          StackedBarChart.chart(
+            :width="520",
+            :series="series",
+            :xvalues="xvalues",
+            :barMargin="0.1",
+            :tick-format="showPercent ? '%' : null"
+          )
+            template(#under="{ xscale }")
+              .poi(:style="{ transform: `translateX(${xscale(longevityStats.max)}px)` }")
+                b-icon(icon="arrow-up")
+                .l longest living in batch
+              .poi(:style="{ transform: `translate(${xscale(longevityStats.afterChildhood)}px, 40px)` }")
+                b-icon(icon="arrow-up")
+                .l life expectancy after childhood
+              .poi(:style="{ transform: `translate(${xscale(longevityStats.expectation)}px, 0)` }")
+                b-icon(icon="arrow-up")
+                .l life expectancy
+        .column
+          h2.is-size-4.heading Chance of Dying
+          p How likely are you to die this year given how old you are?
+          StackedBarChart.chart(
+            :width="520",
+            :series="[{ values: deathChance.map(v => v[1]), color: '#D03D49' }]",
+            :xvalues="deathChance.map(v => v[0])",
+            :barMargin="0",
+            tick-format="%"
+          )
       b-field
         b-checkbox(v-model="showAlive") Show Living
         b-checkbox(v-model="showDead") Show Dead
@@ -19,17 +53,21 @@
       b-field
         b-select(v-model="selected")
           option(v-for="(data, label) in datasetList", :value="data", :key="label") {{ label }}
-
-
 </template>
 
 <script>
+import { scaleThreshold } from 'd3-scale'
 import { bin } from 'd3-array'
 import _sumBy from 'lodash/sumBy'
 import _findLast from 'lodash/findLast'
+import _flatten from 'lodash/flatten'
+import interpolator from '@/lib/interpolator'
 import StackedBarChart from '@/components/StackedBarChart'
-
 import ALL_ANIMAL_DATA from '@/data/all'
+
+const dangerScale = scaleThreshold().domain([0.05, 0.10, 0.5]).range(['safe', 'alright', 'difficult', 'trecherous'])
+const midlifeQualityScale = scaleThreshold().domain([0.1, 0.5, 0.7]).range(['trecherous', 'difficult', 'alright', 'safe'])
+const lifeLengthScale = scaleThreshold().domain([14, 30, 80]).range(['short', 'medium', 'long', 'very long'])
 
 function calcDeaths(data){
   return data.map((v, i) => [v[0], i ? data[i - 1][1] - v[1] : 0])
@@ -39,6 +77,19 @@ function calcDeathAgeExpectation(data){
   let d = calcDeaths(data)
   let tot = _sumBy(d, a => a[1])
   return _sumBy(d, ([age, count]) => age * count) / tot
+}
+
+function getDeathChance(v, age, arr) {
+  let chance = 1
+  let next = arr[age + 1]
+  if (next){
+    if (next[1] === 0){
+      chance = 1
+    } else {
+      chance = 1 - next[1]/v[1]
+    }
+  }
+  return [age, chance]
 }
 
 export default {
@@ -67,6 +118,13 @@ export default {
       }
       return d
     }
+    , deathChance(){
+      let data = this.selected
+      let d = interpolator(
+        _flatten(data.map(getDeathChance).filter(v => v[1] > 0))
+      )
+      return data.map(v => [v[0], d(v[0])]).filter(v => v[0] <= this.longevityStats.max)
+    }
     , xvalues(){
       return this.bins.map(b => b.x0)
     }
@@ -79,6 +137,20 @@ export default {
         expectation
         , afterChildhood
         , max
+      }
+    }
+    , qualitativeRatings(){
+      let data = this.selected
+      let tot = data[0][1]
+      let youngOnesLeft = this.bins[1][0][1]
+      let childhoodDanger = dangerScale(1 - youngOnesLeft / tot)
+      let maxLifetime = lifeLengthScale(this.longevityStats.max)
+      let midlifeEndsAt = _findLast(data, v => v[1] / youngOnesLeft > 0.5)[0] / this.longevityStats.max
+      let midlifeQuality = midlifeQualityScale(midlifeEndsAt)
+      return {
+        childhoodDanger
+        , maxLifetime
+        , midlifeQuality
       }
     }
     , dataDead(){
@@ -106,7 +178,7 @@ export default {
         }
         , {
           values: this.dataRemoved
-          , color: '#B0B0B0'
+          , color: '#e6e6e6'
           , active: this.showAlive
           // , color: '#D03D49'
           // , gapless: true
@@ -119,6 +191,23 @@ export default {
 
 <style lang="sass" scoped>
 .chart
-  margin: 2rem 0
+  margin: 1rem 80px 80px 0
   font-family: $family-monospace
+.poi
+  position: absolute
+  bottom: -28px
+  left: 0
+  line-height: 1
+  text-align: center
+  width: 50px
+  margin-left: -25px
+  font-size: 12px
+  color: $blue
+
+  .l
+    position: absolute
+    width: 140px
+    top: 25px
+    left: 16px
+    text-align: left
 </style>
