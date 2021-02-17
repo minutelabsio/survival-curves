@@ -29,7 +29,7 @@ export function tween({ from, to, delay, duration, step, easing }, group = 'defa
       let grp = registry[group] = registry[group] || new TWEEN.Group()
       new TWEEN.Tween(state, grp)
         .to(to, duration)
-        .delay(delay)
+        .delay(delay | 0)
         .easing(easings[easing])
         .onUpdate(() => step(state))
         .onComplete((arg) => {

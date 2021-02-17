@@ -53,6 +53,21 @@
       b-field
         b-select(v-model="selected")
           option(v-for="(data, label) in datasetList", :value="data", :key="label") {{ label }}
+
+    StackedBarChart.chart(
+      ref="videoChart",
+      :width="1280",
+      :aspect="3/2",
+      :range="videoGraphRange"
+      :series="series",
+      :xvalues="xvalues",
+      :barMargin="0.1",
+      tick-format="%"
+    )
+    b-field
+      b-button(@click="videoGraphRange = [0, 1]") Reset
+      b-button(@click="zoomIn") Go
+
 </template>
 
 <script>
@@ -64,6 +79,7 @@ import _flatten from 'lodash/flatten'
 import interpolator from '@/lib/interpolator'
 import StackedBarChart from '@/components/StackedBarChart'
 import ALL_ANIMAL_DATA from '@/data/all'
+import { tween } from '@/lib/tween'
 
 const dangerScale = scaleThreshold().domain([0.05, 0.10, 0.5]).range(['safe', 'alright', 'difficult', 'trecherous'])
 const midlifeQualityScale = scaleThreshold().domain([0.1, 0.5, 0.7]).range(['trecherous', 'difficult', 'alright', 'safe'])
@@ -104,6 +120,8 @@ export default {
 
     , showDead: true
     , showAlive: true
+
+    , videoGraphRange: [0, 1]
   })
   , computed: {
     bins(){
@@ -178,12 +196,27 @@ export default {
         }
         , {
           values: this.dataRemoved
-          , color: '#e6e6e6'
+          // , color: '#e6e6e6'
           , active: this.showAlive
-          // , color: '#D03D49'
-          // , gapless: true
+          , color: '#D03D49'
+          , gapless: true
         }
       ]
+    }
+  }
+  , methods: {
+    zoomIn(){
+      tween({
+        from: { x: 1 }
+        , to: { x: 0.001 }
+        , duration: 1000
+        , easing: 'easeInOutQuad'
+        , step: s => {
+          // console.log(s)
+          // chart.yrange.range([0, s.x])
+          this.videoGraphRange = [0, s.x]
+        }
+      })
     }
   }
 }
