@@ -27,6 +27,11 @@ export default new Router({
       , component: About
     }
     , {
+      path: '/video-helper'
+      , name: 'video-helper'
+      , component: () => import('@/pages/video.vue')
+    }
+    , {
       path: '/*'
       , redirect: { name: 'home' }
     }

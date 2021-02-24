@@ -2,6 +2,8 @@
 .home
   .container
     .section
+      .is-flex.is-justify-content-center
+        LifeMeter(:lifetable="selected", :bins="bins")
       .columns
         .column.is-half
           p Expected age of Death: {{ longevityStats.expectation }}
@@ -20,6 +22,7 @@
           h2.is-size-4.heading Survival / Death
           p Starting with an initial population, how many survive and die each year?
           StackedBarChart.chart(
+            :animate="true",
             :width="520",
             :series="series",
             :xvalues="xvalues",
@@ -32,7 +35,7 @@
                 .l longest living in batch
               .poi(:style="{ transform: `translate(${xscale(longevityStats.afterChildhood)}px, 40px)` }")
                 b-icon(icon="arrow-up")
-                .l life expectancy after childhood
+                .l life expectancy after year 1
               .poi(:style="{ transform: `translate(${xscale(longevityStats.expectation)}px, 0)` }")
                 b-icon(icon="arrow-up")
                 .l life expectancy
@@ -43,6 +46,7 @@
             :width="520",
             :series="[{ values: deathChance.map(v => v[1]), color: '#D03D49' }]",
             :xvalues="deathChance.map(v => v[0])",
+            :range="[0, 1]"
             :barMargin="0",
             tick-format="%"
           )
@@ -53,21 +57,6 @@
       b-field
         b-select(v-model="selected")
           option(v-for="(data, label) in datasetList", :value="data", :key="label") {{ label }}
-
-    StackedBarChart.chart(
-      ref="videoChart",
-      :width="1280",
-      :aspect="3/2",
-      :range="videoGraphRange"
-      :series="series",
-      :xvalues="xvalues",
-      :barMargin="0.1",
-      tick-format="%"
-    )
-    b-field
-      b-button(@click="videoGraphRange = [0, 1]") Reset
-      b-button(@click="zoomIn") Go
-
 </template>
 
 <script>
@@ -76,10 +65,11 @@ import { bin } from 'd3-array'
 import _sumBy from 'lodash/sumBy'
 import _findLast from 'lodash/findLast'
 import _flatten from 'lodash/flatten'
+import _uniqBy from 'lodash/uniqBy'
 import interpolator from '@/lib/interpolator'
 import StackedBarChart from '@/components/StackedBarChart'
+import LifeMeter from '@/components/LifeMeter'
 import ALL_ANIMAL_DATA from '@/data/all'
-import { tween } from '@/lib/tween'
 
 const dangerScale = scaleThreshold().domain([0.05, 0.10, 0.5]).range(['safe', 'alright', 'difficult', 'trecherous'])
 const midlifeQualityScale = scaleThreshold().domain([0.1, 0.5, 0.7]).range(['trecherous', 'difficult', 'alright', 'safe'])
@@ -112,6 +102,7 @@ export default {
   name: 'Home'
   , components: {
     StackedBarChart
+    , LifeMeter
   }
   , data: () => ({
     datasetList: ALL_ANIMAL_DATA
@@ -120,8 +111,6 @@ export default {
 
     , showDead: true
     , showAlive: true
-
-    , videoGraphRange: [0, 1]
   })
   , computed: {
     bins(){
@@ -139,9 +128,12 @@ export default {
     , deathChance(){
       let data = this.selected
       let d = interpolator(
-        _flatten(data.map(getDeathChance).filter(v => v[1] > 0))
+        _flatten(_uniqBy(data, v => v[1]))
       )
-      return data.map(v => [v[0], d(v[0])]).filter(v => v[0] <= this.longevityStats.max)
+      return data
+        .map(v => [v[0], d(v[0])])
+        .map(getDeathChance)
+        .filter(v => v[0] < this.longevityStats.max)
     }
     , xvalues(){
       return this.bins.map(b => b.x0)
@@ -196,29 +188,15 @@ export default {
         }
         , {
           values: this.dataRemoved
-          // , color: '#e6e6e6'
+          , color: '#e6e6e6'
           , active: this.showAlive
-          , color: '#D03D49'
-          , gapless: true
+          // , color: '#D03D49'
+          // , gapless: true
         }
       ]
     }
   }
-  , methods: {
-    zoomIn(){
-      tween({
-        from: { x: 1 }
-        , to: { x: 0.001 }
-        , duration: 1000
-        , easing: 'easeInOutQuad'
-        , step: s => {
-          // console.log(s)
-          // chart.yrange.range([0, s.x])
-          this.videoGraphRange = [0, s.x]
-        }
-      })
-    }
-  }
+
 }
 </script>
 

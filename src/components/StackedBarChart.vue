@@ -2,9 +2,12 @@
 .barchart
   svg.chart(ref="svg", :width="chartWidth", :height="chartHeight")
     //- along the x direction
-    g(v-for="bar in bars", :transform="`translate(${bar.x}, 0) scale(1, 1)`")
+    g(v-for="(bar, i) in bars", :transform="`translate(${bar.x}, 0) scale(1, 1)`", :key="i")
       //- each stack
-      rect(v-for="layer in bar.layers", v-bind="layer")
+      template(v-for="layer in bar.layers")
+        Motion(v-if="animate", :values="{ height: layer.height, y: layer.y }", tag="g")
+          rect(slot-scope="anim", v-bind="layer", :height="anim.height", :y="anim.y")
+        rect(v-else, v-bind="layer")
   svg.yaxis.no-events(ref="yaxis", width="100", :height="chartHeight + 30")
     g(v-for="tick in yticks", :transform="`translate(100, ${yscale(tick) + 15})`")
       text(text-anchor="end", dominant-baseline="middle", x="-6", y="1.5") {{ytickFormat(tick)}}
@@ -19,6 +22,7 @@
 
 <script>
 import { scaleLinear, scaleBand } from 'd3-scale'
+import { Motion } from 'vue-motion'
 
 export default {
   name: 'StackedBarChart'
@@ -57,8 +61,10 @@ export default {
       type: Array
       , default: () => []
     }
+    , animate: Boolean
   }
   , components: {
+    Motion
   }
   , computed: {
     chartWidth(){ return this.width }
@@ -110,8 +116,11 @@ export default {
 
       return this.xvalues.map((x, i) => {
         let y = 0
-        let layers = this.visibleSeries.map(s => {
+        let layers = this.series.map(s => {
           let h = s.values[i]
+          if (s.active === false){
+            h = 0
+          }
           y += h
           return {
             width: barWidth + (s.gapless ? barMargin * barWidth : 0)
