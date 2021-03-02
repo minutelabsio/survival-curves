@@ -20,12 +20,16 @@
         path(v-bind="early")
         path(v-bind="mid")
         path(v-bind="late")
-  </template>
-
+</template>
 <script>
 import { scaleLinear, scaleThreshold } from 'd3-scale'
 import _findLast from 'lodash/findLast'
 import _sumBy from 'lodash/sumBy'
+
+const red = '#D03D49'
+const yellow = '#FDDE3B'
+const green = '#AEE4C9'
+const blue = '#81c9ec'
 
 // const dangerScale = scaleThreshold().domain([0.05, 0.10, 0.5]).range(['safe', 'alright', 'difficult', 'trecherous'])
 // const midlifeQualityScale = scaleThreshold().domain([0.1, 0.5, 0.7]).range(['trecherous', 'difficult', 'alright', 'safe'])
@@ -33,20 +37,20 @@ import _sumBy from 'lodash/sumBy'
 
 const infantDangerScale = scaleThreshold()
   .domain([0.05, 0.30, 0.5])
-  .range(['#AEE4C9', '#FDDE3B', '#f47e18',  '#D03D49'])
+  .range([green, blue, yellow,  red])
 
 const infantDangerScaleText = infantDangerScale.copy().range(['safe', 'okay', 'difficult', 'trecherous'])
 
 
 const midlifeDangerScale = scaleThreshold()
   .domain([0.2, 0.55, 0.8])
-  .range(['#D03D49', '#f47e18', '#FDDE3B', '#AEE4C9'])
+  .range([red, yellow, blue, green])
 
 const midlifeDangerScaleText = midlifeDangerScale.copy().range(['trecherous', 'difficult', 'okay', 'safe'])
 
 const elderlyDangerScale = scaleThreshold()
   .domain([0.2, 0.55, 0.8])
-  .range(['#AEE4C9', '#FDDE3B', '#f47e18',  '#D03D49'])
+  .range([green, blue, yellow,  red])
 
 const elderlyDangerScaleText = elderlyDangerScale.copy().range(['safe', 'okay', 'difficult', 'trecherous'])
 
@@ -236,7 +240,7 @@ export default {
   font-size: 16px
 .l
   position: absolute
-  bottom: 0
+  top: 100%
   line-height: 1.2
   width: 100%
   color: $grey
@@ -251,7 +255,7 @@ export default {
   &.childhood
     right: 100%
     text-align: right
-    transform: translate(34px, 13px)
+    transform: translate(34px, -10px)
     &::after
       right: 0
       transform: translate(18px, -5px) rotate(-52deg)
@@ -260,7 +264,7 @@ export default {
     width: 100px
     margin-left: -50px
     text-align: center
-    transform: translate(0, 64px)
+    transform: translate(0, 24px)
     &::after
       left: 50%
       margin-left: -7px
@@ -269,7 +273,7 @@ export default {
     left: auto
     left: 100%
     text-align: left
-    transform: translate(-34px, 13px)
+    transform: translate(-34px, -10px)
     &::after
       left: 0
       transform: translate(-18px, -5px) rotate(52deg)
