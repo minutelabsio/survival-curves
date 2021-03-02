@@ -13,7 +13,7 @@
       text(text-anchor="end", dominant-baseline="middle", x="-6", y="1.5") {{ytickFormat(tick)}}
       line.major(x1="-4", x2="0", y1="0", y2="0")
   svg.xaxis(ref="xaxis", :width="chartWidth", height="20")
-    g(v-for="tick in xticks", :transform="`translate(${xscale(tick)}, 0)`")
+    g(v-for="tick in xticks", v-if="xscale(tick)", :transform="`translate(${xscale(tick)}, 0)`")
       text(text-anchor="middle", y="18", :x="barWidth / 2") {{tick}}
       line.major(:x1="barWidth / 2", :x2="barWidth / 2", y1="0", y2="4")
   .under
