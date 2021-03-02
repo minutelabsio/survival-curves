@@ -138,7 +138,7 @@ export default {
     }
     , lifelineTextPath(){
       let r = this.r
-      let range = lifelineScale.range()
+      let range = [Math.PI, 2*Math.PI]
       let points = [
         circlePoint(r, range[0], r, r)
         , circlePoint(r, range[1], r, r)
