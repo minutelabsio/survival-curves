@@ -2,16 +2,25 @@
 .lifemeter
   img.thumb(v-bind="thumbnail")
   b-icon.clock(icon="timer-sand", :style="iconStyle")
-  svg(ref="svg", :width="size", :height="size")
+  .l.childhood {{earlyText}} childhood
+  .l.midlife {{midText}} midlife
+  .l.oldage {{elderlyText}} old age
+  svg(ref="svg", :width="size", :height="size + topPad")
     //- circle(fill="red", :cx="size/2", :cy="size/2", :r="size * 0.5")
-    g
-      path(v-bind="lifelineBg")
-      path(v-bind="lifeline")
-    g.dangers
-      path(v-bind="early")
-      path(v-bind="mid")
-      path(v-bind="late")
-</template>
+    g(:transform="`translate(0 ${topPad})`")
+      g
+        path(:d="lifelineTextPath", id="svglifespan", fill="transparent")
+        path(v-bind="lifelineBg")
+        path(v-bind="lifeline")
+        text.lifelinetext(:width="size", dy="-3")
+          textPath(alignment-baseline="top", xlink:href="#svglifespan", startOffset="50%", text-anchor="middle")
+            | {{label}}: {{ deathAge.toFixed(0) }} years ({{ max }} max)
+
+      g.dangers
+        path(v-bind="early")
+        path(v-bind="mid")
+        path(v-bind="late")
+  </template>
 
 <script>
 import { scaleLinear, scaleThreshold } from 'd3-scale'
@@ -22,9 +31,24 @@ import _sumBy from 'lodash/sumBy'
 // const midlifeQualityScale = scaleThreshold().domain([0.1, 0.5, 0.7]).range(['trecherous', 'difficult', 'alright', 'safe'])
 // const lifeLengthScale = scaleThreshold().domain([14, 30, 80]).range(['short', 'medium', 'long', 'very long'])
 
-const dangerScale = scaleThreshold()
+const infantDangerScale = scaleThreshold()
   .domain([0.05, 0.30, 0.5])
   .range(['#AEE4C9', '#FDDE3B', '#f47e18',  '#D03D49'])
+
+const infantDangerScaleText = infantDangerScale.copy().range(['safe', 'okay', 'difficult', 'trecherous'])
+
+
+const midlifeDangerScale = scaleThreshold()
+  .domain([0.2, 0.55, 0.8])
+  .range(['#D03D49', '#f47e18', '#FDDE3B', '#AEE4C9'])
+
+const midlifeDangerScaleText = midlifeDangerScale.copy().range(['trecherous', 'difficult', 'okay', 'safe'])
+
+const elderlyDangerScale = scaleThreshold()
+  .domain([0.2, 0.55, 0.8])
+  .range(['#AEE4C9', '#FDDE3B', '#f47e18',  '#D03D49'])
+
+const elderlyDangerScaleText = elderlyDangerScale.copy().range(['safe', 'okay', 'difficult', 'trecherous'])
 
 const lifelineScale = scaleLinear()
   .domain([0, 140])
@@ -67,7 +91,10 @@ function wedge(r1, r2, theta1, theta2, ox, oy){
 export default {
   name: 'LifeMeter'
   , props: {
-    size: {
+    label: {
+      type: String
+    }
+    , size: {
       type: Number
       , default: 260
     }
@@ -76,6 +103,10 @@ export default {
     , thickness: {
       type: Number
       , default: 12
+    }
+    , topPad: {
+      type: Number
+      , default: 30
     }
   }
   , components: {
@@ -86,7 +117,7 @@ export default {
       let a = lifelineScale.range()[0] - Math.PI * 0.015
       let x = r * Math.cos(a) + r
       let y = r * Math.sin(a) + r
-      let transform = `translate(${x}px, ${y}px) rotate(${a + Math.PI/2}rad)`
+      let transform = `translate(${x}px, ${y + this.topPad}px) rotate(${a + Math.PI/2}rad)`
       return {
         transform
       }
@@ -101,6 +132,18 @@ export default {
         , fill: '#d6d6d6'
       }
     }
+    , lifelineTextPath(){
+      let r = this.r
+      let range = lifelineScale.range()
+      let points = [
+        circlePoint(r, range[0], r, r)
+        , circlePoint(r, range[1], r, r)
+      ]
+      return [
+        `M ${points[0]}`
+        , `A ${r} ${r}, 0, 0, 1, ${points[1]}`
+      ].join(' ')
+    }
     , lifeline(){
       let r = this.r
       let t = this.thickness / 2
@@ -111,19 +154,33 @@ export default {
         , fill: '#c86f87'
       }
     }
+    // , lifespanText(){
+    //   return {
+
+    //   }
+    // }
     , total(){ return this.lifetable[0][1] }
     , deathAge(){ return calcDeathAgeExpectation(this.lifetable) }
+    , afterInfancyDeathAge(){ return calcDeathAgeExpectation(this.lifetable.filter(a => a[0] > 1)) }
     , max(){
       return _findLast(this.lifetable, a => a[1] > 0)[0]
+    }
+    , batchMax(){
+      return _findLast(this.lifetable, a => a[1] > 1)[0]
     }
     , infantMortality(){
       return (this.total - this.bins[1][0][1]) / this.total
     }
     , middleMortality(){
       let l = this.bins.length
-      let d0 = this.bins[1][0][1]
-      let deaths = this.bins[Math.round(l * 3/4)][0][1]
-      return (d0 - deaths) / this.total
+      let r0 = this.bins[1][0][1]
+      let remaining = this.bins[Math.round(l * 3/4)][0][1]
+      return (r0 - remaining) / this.total
+    }
+    , elderlyMortality(){
+      let l = this.bins.length
+      let remaining = this.bins[this.bins.length - Math.round(l * 1/4)][0][1]
+      return remaining / this.total
     }
     , r(){ return this.size / 2 }
     , thumbnail(){
@@ -132,29 +189,38 @@ export default {
       return {
         src: 'https://crhscountyline.com/wp-content/uploads/2020/03/Capture.png'
         , width
-        , style: { transform: `translate(${margin}px, ${margin}px)` }
+        , style: { transform: `translate(${margin}px, ${margin + this.topPad}px)` }
       }
     }
     , early(){
       let r = this.r
       return {
         d: wedge(r, r - this.thickness, Math.PI * 3/5, Math.PI * 4/5, r, r)
-        , fill: dangerScale(this.infantMortality)
+        , fill: infantDangerScale(this.infantMortality)
       }
+    }
+    , earlyText(){
+      return infantDangerScaleText(this.infantMortality)
     }
     , mid(){
       let r = this.r
       return {
         d: wedge(r, r - this.thickness, Math.PI * 2/5, Math.PI * 3/5, r, r)
-        , fill: dangerScale(this.middleMortality)
+        , fill: midlifeDangerScale(this.afterInfancyDeathAge / this.batchMax)
       }
+    }
+    , midText(){
+      return midlifeDangerScaleText(this.afterInfancyDeathAge / this.batchMax)
     }
     , late(){
       let r = this.r
       return {
         d: wedge(r, r - this.thickness, Math.PI * 1/5, Math.PI * 2/5, r, r)
-        , fill: '#FDDE3B'
+        , fill: elderlyDangerScale(this.afterInfancyDeathAge / this.batchMax)
       }
+    }
+    , elderlyText(){
+      return elderlyDangerScaleText(this.afterInfancyDeathAge / this.batchMax)
     }
   }
 }
@@ -165,6 +231,48 @@ export default {
   position: relative
   display: flex
   flex-direction: column
+  margin-bottom: 80px
+.lifelinetext
+  font-size: 16px
+.l
+  position: absolute
+  bottom: 0
+  line-height: 1.2
+  width: 100%
+  color: $grey
+  font-size: 16px
+  &::after
+    position: absolute
+    top: 0
+    content: ''
+    display: block
+    width: 15px
+    border-top: 2px solid $grey-light
+  &.childhood
+    right: 100%
+    text-align: right
+    transform: translate(34px, 13px)
+    &::after
+      right: 0
+      transform: translate(18px, -5px) rotate(-52deg)
+  &.midlife
+    left: 50%
+    width: 100px
+    margin-left: -50px
+    text-align: center
+    transform: translate(0, 64px)
+    &::after
+      left: 50%
+      margin-left: -7px
+      transform: translate(0px, -12px) rotate(90deg)
+  &.oldage
+    left: auto
+    left: 100%
+    text-align: left
+    transform: translate(-34px, 13px)
+    &::after
+      left: 0
+      transform: translate(-18px, -5px) rotate(52deg)
 // svg
 //   outline: 1px solid red
 .clock

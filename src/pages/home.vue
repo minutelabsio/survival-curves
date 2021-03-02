@@ -3,7 +3,7 @@
   .container
     .section
       .is-flex.is-justify-content-center
-        LifeMeter(:lifetable="selected", :bins="bins")
+        LifeMeter(:label="selectedName", :lifetable="selected", :bins="bins")
       .columns
         .column.is-half
           p Expected age of Death: {{ longevityStats.expectation }}
@@ -55,8 +55,8 @@
         b-checkbox(v-model="showDead") Show Dead
         b-checkbox(v-model="showPercent") Show Percentages
       b-field
-        b-select(v-model="selected")
-          option(v-for="(data, label) in datasetList", :value="data", :key="label") {{ label }}
+        b-select(v-model="selectedName")
+          option(v-for="(data, label) in datasetList", :value="label", :key="label") {{ label }}
 </template>
 
 <script>
@@ -106,14 +106,17 @@ export default {
   }
   , data: () => ({
     datasetList: ALL_ANIMAL_DATA
-    , selected: ALL_ANIMAL_DATA['Humans']
+    , selectedName: 'Humans'
     , showPercent: true
 
     , showDead: true
     , showAlive: true
   })
   , computed: {
-    bins(){
+    selected(){
+      return this.datasetList[this.selectedName]
+    }
+    , bins(){
       return bin()
         .thresholds(Math.min(20, this.selected.length))
         .value(a => a[0])(this.selected)
