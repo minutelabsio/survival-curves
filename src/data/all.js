@@ -1,4 +1,6 @@
 /* eslint-disable */
+import { allStats } from '@/lib/lifespan-stats'
+import _mapValues from 'lodash/mapValues'
 import beaver from './beaver'
 import cat from './cat'
 import dallMountainSheep from './dall-mountain-sheep'
@@ -11,7 +13,7 @@ import lapwing from './lapwing'
 import robin from './robin'
 import turtle from './turtle'
 
-export default Object.freeze({
+export default Object.freeze(_mapValues({
   'Beavers': beaver,
   'House Cats': cat,
   'Dall Mountain Sheep': dallMountainSheep,
@@ -23,4 +25,4 @@ export default Object.freeze({
   'Lapwings': lapwing,
   'Robins': robin,
   'Loggerhead Sea Turtles': turtle,
-})
+}, allStats))

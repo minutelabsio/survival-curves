@@ -1,21 +1,21 @@
 <template lang="pug">
 .home
   .container
+
+    .section
+      .columns.is-mobile.is-multiline
+        .column.is-one-quarter(v-for="(d, animal) in datasetList")
+          a.animal-select(@click="selectedName = animal")
+            LifeMeter(:data="d", :size="160", :thumb="thumbs[animal]")
+            .name {{ animal }}
     .section
       .is-flex.is-justify-content-center
-        LifeMeter(:label="selectedName", :lifetable="selected", :thumb="selectedThumb")
-      .columns
-        .column.is-half
-          p Expected age of Death: {{ longevityStats.expectation }}
-          p Expected age of Death after Childhood: {{ longevityStats.afterChildhood }}
-          p Maximum age: {{ longevityStats.max }}
-        .column.is-half
-          p Childhood:
-            b-tag(type="is-primary") {{ qualitativeRatings.childhoodDanger }}
-          p Adolescence:
-            b-tag(type="is-primary") {{ qualitativeRatings.midlifeQuality }}
-          p Maximum Longevity:
-            b-tag(type="is-primary") {{ qualitativeRatings.maxLifetime }}
+        LifeMeter(:label="selectedName", :data="selected", :thumb="selectedThumb")
+      //- .columns
+      //-   .column.is-half
+      //-     p Expected age of Death: {{ longevityStats.expectation }}
+      //-     p Expected age of Death after Childhood: {{ longevityStats.afterChildhood }}
+      //-     p Maximum age: {{ longevityStats.max }}
 
       .columns
         .column
@@ -54,57 +54,16 @@
         b-checkbox(v-model="showAlive") Show Living
         b-checkbox(v-model="showDead") Show Dead
         b-checkbox(v-model="showPercent") Show Percentages
-      b-field
-        b-select(v-model="selectedName")
-          option(v-for="(data, label) in datasetList", :value="label", :key="label") {{ label }}
 
-    .section
-      .columns.is-mobile.is-multiline
-        .column(v-for="(d, animal) in datasetList")
-          a.animal-select(@click="selectedName = animal")
-            LifeMeter(:lifetable="d", :size="180", :thumb="thumbs[animal]")
-            .name {{ animal }}
 </template>
 
 <script>
-import { scaleThreshold } from 'd3-scale'
 import { bin } from 'd3-array'
 import _sumBy from 'lodash/sumBy'
-import _findLast from 'lodash/findLast'
-import _flatten from 'lodash/flatten'
-import _uniqBy from 'lodash/uniqBy'
-import interpolator from '@/lib/interpolator'
 import StackedBarChart from '@/components/StackedBarChart'
 import LifeMeter from '@/components/LifeMeter'
 import ALL_ANIMAL_DATA from '@/data/all'
 import ThumbImages from '@/assets/animal-thumb-map'
-
-const dangerScale = scaleThreshold().domain([0.05, 0.10, 0.5]).range(['safe', 'alright', 'difficult', 'trecherous'])
-const midlifeQualityScale = scaleThreshold().domain([0.1, 0.5, 0.7]).range(['trecherous', 'difficult', 'alright', 'safe'])
-const lifeLengthScale = scaleThreshold().domain([14, 30, 80]).range(['short', 'medium', 'long', 'very long'])
-
-function calcDeaths(data){
-  return data.map((v, i) => [v[0], i ? data[i - 1][1] - v[1] : 0])
-}
-
-function calcDeathAgeExpectation(data){
-  let d = calcDeaths(data)
-  let tot = _sumBy(d, a => a[1])
-  return _sumBy(d, ([age, count]) => age * count) / tot
-}
-
-function getDeathChance(v, age, arr) {
-  let chance = 1
-  let next = arr[age + 1]
-  if (next){
-    if (next[1] === 0){
-      chance = 1
-    } else {
-      chance = 1 - next[1]/v[1]
-    }
-  }
-  return [age, chance]
-}
 
 export default {
   name: 'Home'
@@ -125,13 +84,14 @@ export default {
     selected(){
       return this.datasetList[this.selectedName]
     }
+    , lifetable(){ return this.selected.lifetable }
     , selectedThumb(){
       return ThumbImages[this.selectedName]
     }
     , bins(){
       return bin()
-        .thresholds(Math.min(20, this.selected.length))
-        .value(a => a[0])(this.selected)
+        .thresholds(Math.min(20, this.lifetable.length))
+        .value(a => a[0])(this.lifetable)
     }
     , dataset(){
       let d = this.bins.map(a => _sumBy(a, v => v[1]))
@@ -140,44 +100,11 @@ export default {
       }
       return d
     }
-    , deathChance(){
-      let data = this.selected
-      let d = interpolator(
-        _flatten(_uniqBy(data, v => v[1]))
-      )
-      return data
-        .map(v => [v[0], d(v[0])])
-        .map(getDeathChance)
-        .filter(v => v[0] < this.longevityStats.max)
-    }
+    , deathChance(){ return this.selected.deathChance }
     , xvalues(){
       return this.bins.map(b => b.x0)
     }
-    , longevityStats(){
-      let data = this.selected
-      let expectation = calcDeathAgeExpectation(data)
-      let afterChildhood = calcDeathAgeExpectation(data.filter(a => a[0] > 1))
-      let max = _findLast(data, a => a[1] > 0)[0]
-      return {
-        expectation
-        , afterChildhood
-        , max
-      }
-    }
-    , qualitativeRatings(){
-      let data = this.selected
-      let tot = data[0][1]
-      let youngOnesLeft = this.bins[1][0][1]
-      let childhoodDanger = dangerScale(1 - youngOnesLeft / tot)
-      let maxLifetime = lifeLengthScale(this.longevityStats.max)
-      let midlifeEndsAt = _findLast(data, v => v[1] / youngOnesLeft > 0.5)[0] / this.longevityStats.max
-      let midlifeQuality = midlifeQualityScale(midlifeEndsAt)
-      return {
-        childhoodDanger
-        , maxLifetime
-        , midlifeQuality
-      }
-    }
+    , longevityStats(){ return this.selected.longevityStats }
     , dataDead(){
       let dataset = this.dataset
       return dataset.map((v, i) => i ? dataset[i - 1] - v : 0)
