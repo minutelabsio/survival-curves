@@ -3,7 +3,7 @@
   .container
     .section
       .is-flex.is-justify-content-center
-        LifeMeter(:label="selectedName", :lifetable="selected", :bins="bins")
+        LifeMeter(:label="selectedName", :lifetable="selected", :thumb="selectedThumb")
       .columns
         .column.is-half
           p Expected age of Death: {{ longevityStats.expectation }}
@@ -57,6 +57,13 @@
       b-field
         b-select(v-model="selectedName")
           option(v-for="(data, label) in datasetList", :value="label", :key="label") {{ label }}
+
+    .section
+      .columns.is-mobile.is-multiline
+        .column(v-for="(d, animal) in datasetList")
+          a.animal-select(@click="selectedName = animal")
+            LifeMeter(:lifetable="d", :size="180", :thumb="thumbs[animal]")
+            .name {{ animal }}
 </template>
 
 <script>
@@ -70,6 +77,7 @@ import interpolator from '@/lib/interpolator'
 import StackedBarChart from '@/components/StackedBarChart'
 import LifeMeter from '@/components/LifeMeter'
 import ALL_ANIMAL_DATA from '@/data/all'
+import ThumbImages from '@/assets/animal-thumb-map'
 
 const dangerScale = scaleThreshold().domain([0.05, 0.10, 0.5]).range(['safe', 'alright', 'difficult', 'trecherous'])
 const midlifeQualityScale = scaleThreshold().domain([0.1, 0.5, 0.7]).range(['trecherous', 'difficult', 'alright', 'safe'])
@@ -106,6 +114,7 @@ export default {
   }
   , data: () => ({
     datasetList: ALL_ANIMAL_DATA
+    , thumbs: ThumbImages
     , selectedName: 'Humans'
     , showPercent: true
 
@@ -115,6 +124,9 @@ export default {
   , computed: {
     selected(){
       return this.datasetList[this.selectedName]
+    }
+    , selectedThumb(){
+      return ThumbImages[this.selectedName]
     }
     , bins(){
       return bin()
@@ -207,6 +219,11 @@ export default {
 .chart
   margin: 1rem 80px 80px 0
   font-family: $family-monospace
+.animal-select
+  display: flex
+  flex-direction: column
+  text-align: center
+  align-items: center
 .poi
   position: absolute
   bottom: -28px

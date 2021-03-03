@@ -1,10 +1,11 @@
 <template lang="pug">
-.lifemeter
+.lifemeter(:class="{ m: !!label }", :style="{ width: size + 'px' }")
   img.thumb(v-bind="thumbnail")
-  b-icon.clock(icon="timer-sand", :style="iconStyle")
-  .l.childhood {{earlyText}} childhood
-  .l.midlife {{midText}} midlife
-  .l.oldage {{elderlyText}} old age
+  b-icon.clock(v-if="label", icon="timer-sand", :style="iconStyle")
+  template(v-if="label")
+    .l.childhood {{earlyText}} childhood
+    .l.midlife {{midText}} midlife
+    .l.oldage {{elderlyText}} old age
   svg(ref="svg", :width="size", :height="size + topPad")
     //- circle(fill="red", :cx="size/2", :cy="size/2", :r="size * 0.5")
     g(:transform="`translate(0 ${topPad})`")
@@ -12,7 +13,7 @@
         path(:d="lifelineTextPath", id="svglifespan", fill="transparent")
         path(v-bind="lifelineBg")
         path(v-bind="lifeline")
-        text.lifelinetext(:width="size", dy="-3")
+        text.lifelinetext(v-if="label", :width="size", dy="-3")
           textPath(alignment-baseline="top", xlink:href="#svglifespan", startOffset="50%", text-anchor="middle")
             | {{label}}: {{ deathAge.toFixed(0) }} years ({{ max }} max)
 
@@ -23,6 +24,7 @@
 </template>
 <script>
 import { scaleLinear, scaleThreshold } from 'd3-scale'
+import { bin } from 'd3-array'
 import _findLast from 'lodash/findLast'
 import _sumBy from 'lodash/sumBy'
 
@@ -55,7 +57,7 @@ const elderlyDangerScale = scaleThreshold()
 const elderlyDangerScaleText = elderlyDangerScale.copy().range(['safe', 'okay', 'difficult', 'trecherous'])
 
 const lifelineScale = scaleLinear()
-  .domain([0, 140])
+  .domain([0, 120])
   .range([Math.PI * 6/5, Math.PI * 9/5])
 
 function calcDeaths(data){
@@ -96,14 +98,14 @@ export default {
   name: 'LifeMeter'
   , props: {
     label: {
-      type: String
+      type: [String, Boolean]
     }
+    , thumb: String
     , size: {
       type: Number
       , default: 260
     }
     , lifetable: Array
-    , bins: Array
     , thickness: {
       type: Number
       , default: 12
@@ -116,7 +118,12 @@ export default {
   , components: {
   }
   , computed: {
-    iconStyle(){
+    bins(){
+      return bin()
+        .thresholds(Math.min(20, this.lifetable.length))
+        .value(a => a[0])(this.lifetable)
+    }
+    , iconStyle(){
       let r = this.r
       let a = lifelineScale.range()[0] - Math.PI * 0.015
       let x = r * Math.cos(a) + r
@@ -191,7 +198,7 @@ export default {
       let margin = 1.618 * this.thickness
       let width = this.size - 2 * margin
       return {
-        src: 'https://crhscountyline.com/wp-content/uploads/2020/03/Capture.png'
+        src: this.thumb
         , width
         , style: { transform: `translate(${margin}px, ${margin + this.topPad}px)` }
       }
@@ -235,9 +242,12 @@ export default {
   position: relative
   display: flex
   flex-direction: column
-  margin-bottom: 80px
+  align-items: center;
+  &.m
+    margin-bottom: 80px
 .lifelinetext
   font-size: 16px
+  fill: $grey
 .l
   position: absolute
   top: 100%
