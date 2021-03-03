@@ -21,7 +21,7 @@ export default Object.freeze(_mapValues({
   'Fin Whales': finWhale,
   'Gopher Tortoises': gopherTortoise,
   'Herring Gulls': herringGull,
-  'Humans': human.map(([age, m, f]) => [age, m + f]),
+  'Humans': human,
   'Lapwings': lapwing,
   'Robins': robin,
   'Loggerhead Sea Turtles': turtle,

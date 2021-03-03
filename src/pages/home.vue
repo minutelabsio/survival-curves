@@ -4,9 +4,9 @@
 
     .section
       .columns.is-mobile.is-multiline
-        .column.is-one-quarter(v-for="(d, animal) in datasetList")
+        .column(v-for="(d, animal) in datasetList")
           a.animal-select(@click="selectedName = animal")
-            LifeMeter(:data="d", :size="160", :thumb="thumbs[animal]")
+            LifeMeter(:data="d", :size="120", :thumb="thumbs[animal]")
             .name {{ animal }}
     .section
       .is-flex.is-justify-content-center
@@ -59,7 +59,7 @@
 
 <script>
 import { bin } from 'd3-array'
-import _sumBy from 'lodash/sumBy'
+// import _sumBy from 'lodash/sumBy'
 import StackedBarChart from '@/components/StackedBarChart'
 import LifeMeter from '@/components/LifeMeter'
 import ALL_ANIMAL_DATA from '@/data/all'
@@ -85,6 +85,7 @@ export default {
       return this.datasetList[this.selectedName]
     }
     , lifetable(){ return this.selected.lifetable }
+    , total(){ return this.lifetable[0][1] }
     , selectedThumb(){
       return ThumbImages[this.selectedName]
     }
@@ -94,9 +95,9 @@ export default {
         .value(a => a[0])(this.lifetable)
     }
     , dataset(){
-      let d = this.bins.map(a => _sumBy(a, v => v[1]))
+      let d = this.bins.map(a => a[a.length - 1][1])
       if ( this.showPercent ){
-        return d.map(v => v / d[0])
+        return d.map(v => v / this.total)
       }
       return d
     }

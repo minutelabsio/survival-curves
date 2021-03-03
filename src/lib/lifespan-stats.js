@@ -15,14 +15,15 @@ export function calcDeathAgeExpectation(data){
   return _sumBy(d, ([age, count]) => age * count) / tot
 }
 
-export function getDeathChance(v, age, arr) {
+export function getDeathChance(v, i, arr) {
   let chance = 1
-  let next = arr[age + 1]
+  let age = v[0]
+  let next = arr[i + 1]
   if (next){
     if (next[1] === 0){
       chance = 1
     } else {
-      chance = 1 - next[1]/v[1]
+      chance = 1 - Math.min(1, next[1] / v[1])
     }
   }
   return [age, chance]
@@ -41,12 +42,13 @@ export function longevityStats(data){
 
 export function deathChance(data, max){
   let d = interpolator(
-    _flatten(_uniqBy(data, v => v[1]))
+    _flatten(_uniqBy(data, v => v[1])),
+    { useSpline: true }
   )
-  return data
-    .map(v => [v[0], d(v[0])])
+  return Array(max).fill(1)
+    .map((z, age) => [age, d(age)])
     .map(getDeathChance)
-    .filter(v => v[0] < max)
+    .filter(v => v[0] < max - 1)
 }
 
 export function riskByStage(deathChances){
