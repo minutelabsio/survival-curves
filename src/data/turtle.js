@@ -1,4 +1,6 @@
 /* eslint-disable */
+export const maxLifetime = 80
+
 export default [
 [0, 100000],
 [1, 50000],

@@ -136,7 +136,7 @@ export default {
     }
     , total(){ return this.lifetable[0][1] }
     , deathAge(){ return this.data.longevityStats.expectation }
-    , max(){ return this.data.longevityStats.max }
+    , max(){ return this.data.maxLifetime }
     , r(){ return this.size / 2 }
     , thumbnail(){
       let margin = 1.618 * this.thickness

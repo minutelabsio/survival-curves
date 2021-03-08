@@ -23,7 +23,7 @@
           p Starting with an initial population, how many survive and die each year?
           StackedBarChart.chart(
             :animate="true",
-            :width="520",
+            :width="plotWidth",
             :series="series",
             :xvalues="xvalues",
             :barMargin="0.1",
@@ -43,7 +43,7 @@
           h2.is-size-4.heading Chance of Dying
           p How likely are you to die this year given how old you are?
           StackedBarChart.chart(
-            :width="520",
+            :width="plotWidth",
             :series="[{ values: deathChance.map(v => v[1]), color: '#D03D49' }]",
             :xvalues="deathChance.map(v => v[0])",
             :range="[0, 1]"
@@ -76,6 +76,7 @@ export default {
     , thumbs: ThumbImages
     , selectedName: 'Humans'
     , showPercent: true
+    , plotWidth: 300
 
     , showDead: true
     , showAlive: true
