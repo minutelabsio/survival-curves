@@ -59,7 +59,7 @@
 
 <script>
 import { bin } from 'd3-array'
-// import _sumBy from 'lodash/sumBy'
+import _meanBy from 'lodash/meanBy'
 import StackedBarChart from '@/components/StackedBarChart'
 import LifeMeter from '@/components/LifeMeter'
 import ALL_ANIMAL_DATA from '@/data/all'
@@ -95,7 +95,7 @@ export default {
         .value(a => a[0])(this.lifetable)
     }
     , dataset(){
-      let d = this.bins.map(a => a[a.length - 1][1])
+      let d = this.bins.map(a => _meanBy(a, v => v[1]))
       if ( this.showPercent ){
         return d.map(v => v / this.total)
       }
@@ -108,13 +108,13 @@ export default {
     , longevityStats(){ return this.selected.longevityStats }
     , dataDead(){
       let dataset = this.dataset
-      return dataset.map((v, i) => i ? dataset[i - 1] - v : 0)
+      return dataset.map((v, i) => i ? dataset[i - 1] - v : 1 - v).map(v => Math.max(v, 0))
     }
     , dataRemoved(){
       let dataset = this.dataset
       let dead = this.dataDead
       let showDead = this.showDead
-      let count = dataset[0]
+      let count = 1 //dataset[0]
       return dataset.map((v, i) => count - v - (showDead ? dead[i] : 0) )
     }
     , series(){

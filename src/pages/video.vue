@@ -2,18 +2,28 @@
 .container
   .section
     b-field
-      b-select(v-model="selected")
-        option(v-for="(data, label) in datasetList", :value="data", :key="label") {{ label }}
+      b-select(v-model="selectedName")
+        option(v-for="(data, label) in datasetList", :value="label", :key="label") {{ label }}
     StackedBarChart.chart(
       ref="videoChart",
       :width="width",
       :height="1280/(3/2)",
-      :range="videoGraphRange"
       :series="series",
+      :range="videoGraphRange",
       :xvalues="xvalues",
       :barMargin="0.1",
       tick-format="~%"
     )
+    //- StackedBarChart.chart(
+    //-   ref="videoChart",
+    //-   :width="width",
+    //-   :height="1280/(3/2)",
+    //-   :range="videoGraphRange"
+    //-   :series="series",
+    //-   :xvalues="xvalues",
+    //-   :barMargin="0.1",
+    //-   tick-format="~%"
+    //- )
     b-field(grouped)
       b-field(label="Y from")
         b-input(type="number", v-model="from", step="0.00001")
@@ -23,13 +33,13 @@
         b-button(@click="swap") swap
     b-field
       b-button(@click="reset") Reset
-      b-button(@click="zoomIn") Y axis zoom
+      b-button(@click="zoomIn", type="is-primary") Y axis zoom
 
-    b-field(grouped)
-      b-field(label="x to")
-        b-input(type="number", v-model="xto")
-      b-field
-        b-button(@click="zoomX") X axis animate
+    //- b-field(grouped)
+    //-   b-field(label="x to")
+    //-     b-input(type="number", v-model="xto")
+    //-   b-field
+    //-     b-button(@click="zoomX") X axis animate
 </template>
 
 <script>
@@ -39,18 +49,26 @@ import ALL_ANIMAL_DATA from '@/data/all'
 
 function addOldest(arr, oldest){
   let ret = []
-  for (let a = 0; a <= oldest; a++){
+  let age = 0
+  let a = 0
+  for (a = 0; age < oldest && arr[a]; a++){
+    age = arr[a][0]
     let v = arr[a] ? arr[a][1] : 0
-    ret[a] = [a, v + 1]
+    ret[a] = [age, v + 1]
   }
-  ret.push([oldest + 1, 0])
+  age += 5
+  for (; age < oldest; a++){
+    ret.push([age, 1])
+    age += 5
+  }
+  ret.push([age, 1])
   return ret
 }
 
-const humans = addOldest(ALL_ANIMAL_DATA["Humans"], 122)
+const humans = addOldest(ALL_ANIMAL_DATA["Humans"].lifetable, 120) //122
 
 const datasetList = Object.assign({}, ALL_ANIMAL_DATA, {
-  "Humans": humans
+  "Humans": Object.assign({}, ALL_ANIMAL_DATA['Humans'], { lifetable: humans })
 })
 
 export default {
@@ -59,7 +77,7 @@ export default {
   , data: () => ({
     showDead: false
     , datasetList: Object.freeze(datasetList)
-    , selected: datasetList["Humans"]
+    , selectedName: 'Humans'
 
     , from: 1
     , to: 0.01
@@ -74,14 +92,14 @@ export default {
       return [
         {
           values: this.dataset
-          , color: '#AEE4C9'
+          , color: '#5BE9AE'
           , active: this.showAlive
         }
         , {
           values: this.dataRemoved
           // , color: '#e6e6e6'
           , active: this.showAlive
-          , color: '#D03D49'
+          , color: '#DB3F3F'
           , gapless: true
         }
       ]
