@@ -85,7 +85,7 @@ export default {
         .range([this.barWidth / 2, xscale(this.xvalues[this.xvalues.length - 1]) + this.barWidth / 2])
     }
     , xticks(){
-      return this.xscaleLinear.ticks()
+      return this.xscaleLinear.ticks(this.chartWidth > 480 ? 10 : 6)
     }
     , visibleSeries(){
       return this.series.filter(s => s.active !== false)
@@ -103,7 +103,7 @@ export default {
         .domain(domain)
         .range([this.chartHeight, this.margin - 1])
     }
-    , yticks(){ return this.yscale.ticks(10) }
+    , yticks(){ return this.yscale.ticks(this.chartWidth > 480 ? 10 : 6) }
     , ytickFormat(){ return this.yscale.tickFormat(10, this.tickFormat) }
     , barWidth(){
       return this.xscale.bandwidth()
@@ -149,15 +149,16 @@ export default {
   display: flex
   flex-direction: column
 svg.chart
-  border: 1px solid lighten($sand, 30)
+  border: 1px solid lighten($grey, 20)
   border-radius: 3px 3px 3px 0
 .major
-  stroke: lighten($sand, 30)
+  stroke: lighten($grey, 20)
 .yaxis
   position: absolute
   top: -15px
   left: -100px
   // outline: 1px solid red
 text
-  fill: $sand
+  font-size: 14px
+  fill: lighten($grey, 20)
 </style>

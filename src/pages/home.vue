@@ -1,26 +1,27 @@
 <template lang="pug">
 .home
-  .container
+  .section.upper-section
+    .container
+      .content
+        h1.title.is-size-1 What is "Life Expectancy" anyway?
+        p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at est et nisi laoreet vestibulum ac non justo. Donec convallis quam nec enim bibendum placerat. Proin vulputate lorem pellentesque nisi tincidunt, eu ultricies dolor ultricies. Vestibulum pharetra mi hendrerit ex eleifend, vitae facilisis odio ullamcorper. Mauris porttitor velit in felis lobortis facilisis. Mauris rhoncus, lacus nec malesuada venenatis, odio justo condimentum mi, sit amet elementum arcu justo bibendum justo. Curabitur at massa ut ante egestas mollis. Suspendisse eu justo lorem. Nulla a augue accumsan, sodales tortor vitae, interdum arcu. Sed iaculis gravida sem, eget suscipit risus blandit ut. Ut molestie tristique nisl vitae egestas. In accumsan magna at urna lobortis, ut luctus magna lobortis. Pellentesque est arcu, placerat imperdiet facilisis sit amet, sodales in libero. Nam ac fermentum justo, quis consequat libero. Integer cursus vel sem id vehicula.
 
-    .section
-      .columns.is-mobile.is-multiline
-        .column(v-for="(d, animal) in datasetList")
-          a.animal-select(@click="selectedName = animal")
-            LifeMeter(:data="d", :size="120", :thumb="thumbs[animal]")
-            .name {{ animal }}
-    .section
-      .is-flex.is-justify-content-center
-        LifeMeter(:label="selectedName", :data="selected", :thumb="selectedThumb")
-      //- .columns
-      //-   .column.is-half
-      //-     p Expected age of Death: {{ longevityStats.expectation }}
-      //-     p Expected age of Death after Childhood: {{ longevityStats.afterChildhood }}
-      //-     p Maximum age: {{ longevityStats.max }}
+        p Here are some animals to choose from...
+  .animal-selector
+    AnimalSelection.sel(@select="selectAnimal($event, name)", v-model="selectedName")
+  .section
+    .container
+      .is-flex.is-flex-direction-column.is-align-items-center
+        .heading.title.is-size-2 {{ selectedName }}
+        LifeMeter(:labels="true", :data="selected", :thumb="selectedThumb")
 
-      .columns
-        .column
-          h2.is-size-4.heading Survival / Death
-          p Starting with an initial population, how many survive and die each year?
+      //- .content.has-text-centered
+      //-   h2.is-size-3.title Survival / Death
+
+      .columns.pad
+        .column.negate-space
+          b-field.toggle
+            b-switch(v-model="showAlive", :true-value="false", :false-value="true") Only deaths
           StackedBarChart.chart(
             :animate="true",
             :width="plotWidth",
@@ -31,45 +32,71 @@
           )
             template(#under="{ xscale }")
               .poi(:style="{ transform: `translateX(${xscale(longevityStats.max)}px)` }")
-                b-icon(icon="arrow-up")
-                .l longest living in batch
-              .poi(:style="{ transform: `translate(${xscale(longevityStats.afterChildhood)}px, 40px)` }")
-                b-icon(icon="arrow-up")
-                .l life expectancy after year 1
+                .on-axis
+                  b-tooltip(:label="`longest living in batch: ${longevityStats.max.toFixed(0)} years`", type="is-light", position="is-bottom", multilined)
+                    .nib
+              .poi(:style="{ transform: `translate(${xscale(longevityStats.afterChildhood)}px, 0)` }")
+                .on-axis
+                  b-tooltip(:label="`life expectancy after year 1: ${longevityStats.afterChildhood.toFixed(0)} years`", type="is-light", position="is-bottom", multilined)
+                    .nib
               .poi(:style="{ transform: `translate(${xscale(longevityStats.expectation)}px, 0)` }")
-                b-icon(icon="arrow-up")
-                .l life expectancy
+                .on-axis
+                  b-tooltip(:label="`life expectancy: ${longevityStats.expectation.toFixed(0)} years`", type="is-light", position="is-bottom", multilined)
+                    .nib
         .column
-          h2.is-size-4.heading Chance of Dying
-          p How likely are you to die this year given how old you are?
+          .content
+            h2.is-size-4.title
+              span.survivors Survival
+              span=" / "
+              span.deaths Death
+            p.
+              <span class="highlight">{{ selectedName | titleCase }}</span> will live to reach
+              an average age of <span class="highlight">{{longevityStats.expectation.toFixed(0)}} years</span>.
+            p Starting with an initial population, how many survive and die each year?
+
+            p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at est et nisi laoreet vestibulum ac non justo. Donec convallis quam nec enim bibendum placerat. Proin vulputate lorem pellentesque nisi tincidunt, eu ultricies dolor ultricies. Vestibulum pharetra mi hendrerit ex eleifend, vitae facilisis odio ullamcorper. Mauris porttitor velit in felis lobortis facilisis. Mauris rhoncus, lacus nec malesuada venenatis, odio justo condimentum mi, sit amet elementum arcu justo bibendum justo. Curabitur at massa ut ante egestas mollis. Suspendisse eu justo lorem. Nulla a augue accumsan, sodales tortor vitae, interdum arcu. Sed iaculis gravida sem, eget suscipit risus blandit ut. Ut molestie tristique nisl vitae egestas.
+
+      //- .content.has-text-centered
+      //-   h2.is-size-3.title Chance of Dying
+
+      .columns.pad
+        .column
           StackedBarChart.chart(
             :width="plotWidth",
             :series="[{ values: deathChance.map(v => v[1]), color: '#D03D49' }]",
             :xvalues="deathChance.map(v => v[0])",
-            :range="[0, 1]"
+            :range="[0, 1]",
             :barMargin="0",
             tick-format="%"
           )
-      b-field
-        b-checkbox(v-model="showAlive") Show Living
-        b-checkbox(v-model="showDead") Show Dead
-        b-checkbox(v-model="showPercent") Show Percentages
+        .column
+          .content
+            h2.is-size-4.title Chance of Dying
+            p How likely are you to die this year given how old you are?
+            p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at est et nisi laoreet vestibulum ac non justo. Donec convallis quam nec enim bibendum placerat. Proin vulputate lorem pellentesque nisi tincidunt, eu ultricies dolor ultricies. Vestibulum pharetra mi hendrerit ex eleifend, vitae facilisis odio ullamcorper. Mauris porttitor velit in felis lobortis facilisis. Mauris rhoncus, lacus nec malesuada venenatis, odio justo condimentum mi, sit amet elementum arcu justo bibendum justo. Curabitur at massa ut ante egestas mollis. Suspendisse eu justo lorem. Nulla a augue accumsan, sodales tortor vitae, interdum arcu. Sed iaculis gravida sem, eget suscipit risus blandit ut. Ut molestie tristique nisl vitae egestas.
 
+  footer.footer
+    .container
+      .content
+        h1.title.is-size-1 Credits
+        p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at est et nisi laoreet vestibulum ac non justo. Donec convallis quam nec enim bibendum placerat. Proin vulputate lorem pellentesque nisi tincidunt, eu ultricies dolor ultricies. Vestibulum pharetra mi hendrerit ex eleifend, vitae facilisis odio ullamcorper. Mauris porttitor velit in felis lobortis facilisis. Mauris rhoncus, lacus nec malesuada venenatis, odio justo condimentum mi, sit amet elementum arcu justo bibendum justo. Curabitur at massa ut ante egestas mollis. Suspendisse eu justo lorem. Nulla a augue accumsan, sodales tortor vitae, interdum arcu. Sed iaculis gravida sem, eget suscipit risus blandit ut. Ut molestie tristique nisl vitae egestas. In accumsan magna at urna lobortis, ut luctus magna lobortis. Pellentesque est arcu, placerat imperdiet facilisis sit amet, sodales in libero. Nam ac fermentum justo, quis consequat libero. Integer cursus vel sem id vehicula.
 </template>
 
 <script>
 import { bin } from 'd3-array'
-import _meanBy from 'lodash/meanBy'
+import _throttle from 'lodash/throttle'
 import StackedBarChart from '@/components/StackedBarChart'
 import LifeMeter from '@/components/LifeMeter'
 import ALL_ANIMAL_DATA from '@/data/all'
 import ThumbImages from '@/assets/animal-thumb-map'
+import AnimalSelection from '@/components/AnimalSelection'
 
 export default {
   name: 'Home'
   , components: {
     StackedBarChart
     , LifeMeter
+    , AnimalSelection
   }
   , data: () => ({
     datasetList: ALL_ANIMAL_DATA
@@ -81,6 +108,19 @@ export default {
     , showDead: true
     , showAlive: true
   })
+  , mounted(){
+    const onResize = _throttle(() => {
+      let w = Math.min(560, window.innerWidth)
+      this.plotWidth = Math.floor(w - 2 * 30)
+    }, 80)
+
+    window.addEventListener('resize', onResize)
+    onResize()
+
+    this.$on('hook:beforeDestroy', () => {
+      window.removeEventListener('resize', onResize)
+    })
+  }
   , computed: {
     selected(){
       return this.datasetList[this.selectedName]
@@ -96,7 +136,7 @@ export default {
         .value(a => a[0])(this.lifetable)
     }
     , dataset(){
-      let d = this.bins.map(a => _meanBy(a, v => v[1]))
+      let d = this.bins.map(a => a[0][1]) //.map(a => _meanBy(a, v => v[1]))
       if ( this.showPercent ){
         return d.map(v => v / this.total)
       }
@@ -115,7 +155,7 @@ export default {
       let dataset = this.dataset
       let dead = this.dataDead
       let showDead = this.showDead
-      let count = 1 //dataset[0]
+      let count = this.showPercent? 1 : dataset[0]
       return dataset.map((v, i) => count - v - (showDead ? dead[i] : 0) )
     }
     , series(){
@@ -140,14 +180,69 @@ export default {
       ]
     }
   }
+  , methods: {
+    selectAnimal(e, name){
+      this.selectedName = name
+    }
+  }
 
 }
 </script>
 
 <style lang="sass" scoped>
-.chart
-  margin: 1rem 80px 80px 0
+$newBlue: #314852
+.footer,
+.upper-section
+  background: rgb(223, 246, 255)
+  .content
+    color: $black
+    .title
+      color: $newBlue
+.toggle
   font-family: $family-monospace
+  text-transform: uppercase
+.animal-selector
+  background: #fff6e1
+  position: relative
+  &:after
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    pointer-events: none
+    box-shadow: inset -2px 1px 2px #00000052
+    @media screen and (min-width: 1210px)
+      box-shadow: none
+  .sel
+    max-width: 1280px
+    margin: auto
+
+
+  ::v-deep .dangers path
+    stroke: #fff6e1
+
+.survivors
+  color: #7dd4a9
+.deaths
+  color: #D03D49
+.highlight
+  color: $grey
+  font-weight: bold
+  text-decoration: underline
+.negate-space
+  margin-top: -2.2rem
+.pad
+  margin-top: 1rem
+.chart
+  margin: 0.5rem 80px 80px 0
+  font-family: $family-monospace
+
+  @media screen and (max-width: $tablet)
+    margin-left: 3ex
+    margin-right: 0
+
 .animal-select
   display: flex
   flex-direction: column
@@ -155,19 +250,34 @@ export default {
   align-items: center
 .poi
   position: absolute
-  bottom: -28px
+  bottom: 0
   left: 0
   line-height: 1
   text-align: center
   width: 50px
   margin-left: -25px
-  font-size: 12px
-  color: $blue
-
-  .l
+  .on-axis
     position: absolute
-    width: 140px
-    top: 25px
-    left: 16px
-    text-align: left
+    top: 0
+    left: 0
+    transform: translate(23px, -30px)
+  .nib
+    width: 11px
+    height: 11px
+    background: $newBlue
+    border-radius: 50%
+    animation: swell 2s infinite;
+
+@keyframes swell
+  $start: transparentize($newBlue, 0.1)
+  $end: transparentize($newBlue, 1)
+  0%
+    box-shadow: inset 0 0 0 1000px $end, 0 0 0 0px $end
+    border-color: $end
+  2%
+    box-shadow: inset 0 0 0 1000px $start, 0 0 0 0px $start
+    border-color: $start
+  100%
+    box-shadow: inset 0 0 0 1000px $end, 0 0 0 5px $end
+    border-color: $end
 </style>

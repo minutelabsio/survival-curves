@@ -1,22 +1,25 @@
 <template lang="pug">
-.lifemeter(:class="{ m: !!label }", :style="{ width: size + 'px' }")
+.lifemeter(:class="{ m: !!labels }", :style="{ width: size + 'px' }")
   transition(name="fade")
     img.thumb(v-bind="thumbnail", :key="thumb")
-  b-icon.clock(v-if="label", icon="timer-sand", :style="iconStyle")
-  template(v-if="label")
-    .l.childhood {{earlyText}} childhood
-    .l.midlife {{midText}} midlife
-    .l.oldage {{elderlyText}} old age
-  svg(ref="svg", :width="size", :height="size + topPad")
+  b-icon.clock(v-if="labels", icon="timer-sand", :style="iconStyle")
+  template(v-if="labels")
+    .l.childhood
+      span {{earlyText}} childhood
+    .l.midlife
+      span {{midText}} midlife
+    .l.oldage
+      span {{elderlyText}} old age
+  svg(ref="svg", :width="size + 2 * topPad", :height="size + topPad")
     //- circle(fill="red", :cx="size/2", :cy="size/2", :r="size * 0.5")
-    g(:transform="`translate(0 ${topPad})`")
+    g(:transform="`translate(${topPad} ${topPad})`")
       g
         path(:d="lifelineTextPath", :id="uniqueId", fill="transparent")
         path(v-bind="lifelineBg")
         path(v-bind="lifeline")
-        text.lifelinetext(v-if="label", :width="size", dy="-3")
+        text.lifelinetext(v-if="labels", :width="size", dy="-3")
           textPath(alignment-baseline="top", :xlink:href="'#' + uniqueId", startOffset="50%", text-anchor="middle")
-            | {{label}}: {{ deathAge.toFixed(0) }} years ({{ max }} max)
+            | {{ deathAge.toFixed(0) }} years ({{ max }} max)
 
       g.dangers
         path(v-bind="early")
@@ -69,9 +72,7 @@ function wedge(r1, r2, theta1, theta2, ox, oy){
 export default {
   name: 'LifeMeter'
   , props: {
-    label: {
-      type: [String, Boolean]
-    }
+    labels: Boolean
     , thumb: String
     , size: {
       type: Number
@@ -114,10 +115,11 @@ export default {
     }
     , lifelineTextPath(){
       let r = this.r
+      let dy = 6
       let range = [Math.PI, 2*Math.PI]
       let points = [
-        circlePoint(r, range[0], r, r)
-        , circlePoint(r, range[1], r, r)
+        circlePoint(r + dy, range[0], r, r)
+        , circlePoint(r + dy, range[1], r, r)
       ]
       return [
         `M ${points[0]}`
@@ -190,15 +192,17 @@ export default {
   &.m
     margin-bottom: 80px
 .lifelinetext
-  font-size: 16px
-  fill: $grey
+  font-size: 19px
+  font-weight: 600
+  fill: $black
 .l
   position: absolute
   top: 100%
   line-height: 1.2
   width: 100%
-  color: $grey
-  font-size: 16px
+  color: $black
+  font-size: 14px
+  text-transform: uppercase
   &::after
     position: absolute
     top: 0
@@ -213,6 +217,13 @@ export default {
     &::after
       right: 0
       transform: translate(18px, -5px) rotate(-52deg)
+    @media screen and (max-width: 480px)
+      &
+        width: 14ex
+      span
+        display: inline-block
+        transform: translate(30px, 8px);
+        // text-align: right
   &.midlife
     left: 50%
     width: 100px
@@ -231,6 +242,13 @@ export default {
     &::after
       left: 0
       transform: translate(-18px, -5px) rotate(52deg)
+    @media screen and (max-width: 480px)
+      &
+        width: 14ex
+      span
+        display: inline-block
+        transform: translate(-30px, 6px);
+
 svg path
   transition: fill .3s ease
 .clock
@@ -248,8 +266,6 @@ svg path
   top: 0
   left: 0
   border-radius: 50%
-text
-  fill: $sand
 
 .fade-enter-active, .fade-leave-active
   transition: opacity .3s

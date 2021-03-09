@@ -14,6 +14,7 @@ import * as robin from './robin'
 import * as turtle from './turtle'
 
 export default Object.freeze(_mapValues({
+  'Humans': human,
   'Beavers': beaver,
   'House Cats': cat,
   'Dall Mountain Sheep': dallMountainSheep,
@@ -21,7 +22,6 @@ export default Object.freeze(_mapValues({
   'Fin Whales': finWhale,
   'Gopher Tortoises': gopherTortoise,
   'Herring Gulls': herringGull,
-  'Humans': human,
   'Lapwings': lapwing,
   'Robins': robin,
   'Loggerhead Sea Turtles': turtle,
