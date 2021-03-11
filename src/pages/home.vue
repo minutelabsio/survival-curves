@@ -202,8 +202,6 @@ export default {
     this.$on('hook:beforeDestroy', () => {
       window.removeEventListener('resize', onResize)
     })
-
-    this.$ga.page('/')
   }
   , computed: {
     selected(){
