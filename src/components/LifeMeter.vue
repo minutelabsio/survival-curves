@@ -39,7 +39,7 @@ const riskScale = scaleThreshold()
   .domain([0.05, 0.20, 0.40])
   .range([green, blue, yellow,  red])
 
-const riskScaleText = riskScale.copy().range(['safe', 'okay', 'difficult', 'trecherous'])
+const riskScaleText = riskScale.copy().range(['safe', 'okay', 'difficult', 'treacherous'])
 
 const lifelineScale = scaleLinear()
   .domain([0, 120])

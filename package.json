@@ -18,6 +18,7 @@
     "d3-scale": "^3.2.3",
     "lodash": "^4.17.10",
     "vue": "^2.5.17",
+    "vue-affix-box": "^1.0.1",
     "vue-analytics": "^5.17.2",
     "vue-motion": "^0.2.3",
     "vue-router": "^3.0.2",

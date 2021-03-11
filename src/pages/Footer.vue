@@ -4,14 +4,14 @@
       .columns
         .column
           .content
-            h3.title.is-size-2 More cool stuff
+            h3.title.is-size-2 More Interactives!
             .media
               .media-left
                 .image.is-128x128
                   a(href="https://minutelabs.io")
                     img.is-rounded.has-background-white(src="//cdn.minutelabs.io/logos/logo-minutelabs-no-text.png")
               .media-content
-                p Find more "labs" on <a href="https://minutelabs.io">minutelabs.io</a>
+                p Find more "labs" at <a href="https://minutelabs.io">minutelabs.io</a>
 
             h3.title.is-size-2 Support MinuteLabs
 

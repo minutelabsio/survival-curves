@@ -3,12 +3,53 @@
   .section.upper-section
     .container
       .content
-        h1.title.is-size-1 What is "Life Expectancy" anyway?
-        p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at est et nisi laoreet vestibulum ac non justo. Donec convallis quam nec enim bibendum placerat. Proin vulputate lorem pellentesque nisi tincidunt, eu ultricies dolor ultricies. Vestibulum pharetra mi hendrerit ex eleifend, vitae facilisis odio ullamcorper. Mauris porttitor velit in felis lobortis facilisis. Mauris rhoncus, lacus nec malesuada venenatis, odio justo condimentum mi, sit amet elementum arcu justo bibendum justo. Curabitur at massa ut ante egestas mollis. Suspendisse eu justo lorem. Nulla a augue accumsan, sodales tortor vitae, interdum arcu. Sed iaculis gravida sem, eget suscipit risus blandit ut. Ut molestie tristique nisl vitae egestas. In accumsan magna at urna lobortis, ut luctus magna lobortis. Pellentesque est arcu, placerat imperdiet facilisis sit amet, sodales in libero. Nam ac fermentum justo, quis consequat libero. Integer cursus vel sem id vehicula.
+        h1.title.is-size-1 Survival Curves
+        .columns
+          .column
+            p.
+              If you've ever been curious how long, say, dogs live on average,
+              you may have gone online and typed out a search term like:
+              <em>life expectancy dogs</em>. And google (or bing, if you're
+              a committed nonconformist) would have given you a number.
+            p.
+              But sometimes getting numeric answers isn't quite that easy.
+              As Douglas Adams reminded us in the "Hitchiker's Guide to the Galaxy",
+              if you get an answer of 42, you may need to check what the actual
+              question was...
+            p.
+              And so it is the same with <em>life expectancy</em>.
+            p.
+              As David nicely explains in <a href="" target="_blank">this MinuteEarth video</a>,
+              life expectancy is an answer to several different questions:
 
-        p Here are some animals to choose from...
-  .animal-selector
-    AnimalSelection.sel(@select="selectAnimal($event, name)", v-model="selectedName")
+            ol
+              li How long, on average, do individuals live after birth?
+              li How long, on average, do individuals live after infancy?
+              li What is the longest time we know some individual has ever lived?
+
+          .column
+            ResponsiveEmbed(:ratio="16/9", :max-width="540").
+              <iframe width="313" height="176" src="https://www.youtube.com/embed/tnIZybxCW1k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+        p.
+          So you've got make sure you know which life expectancy is being
+          talked about so you can know if it answers the question you care
+          about. To clear up all the confusion, this lab lets you browse through
+          a few types of animals and see their different life expectancies
+          and where they come from.
+
+        p.
+          The lab has also got little color bars below the animal icons which
+          give a sense of how dangerous different parts of their lives are.
+          The first bar measures the danger (average death chance) right after being born.
+          The second measures the average danger through to 60% of their maximum
+          lifespan. The last is the danger through the rest of their possible lifespan up to
+          the maximum.
+
+        p Without further ado, here are some animals to choose from...
+  vue-affix-box(:offset-top="0")
+    .animal-selector
+      AnimalSelection.sel(@select="selectAnimal($event, name)", v-model="selectedName")
   .section
     .container
       .is-flex.is-flex-direction-column.is-align-items-center
@@ -30,12 +71,15 @@
               Every <span class="survivors">green block</span> shows the fraction of individuals that are still alive
               when they reach that age. The <span class="deaths">red blocks</span> show the fraction
               that died since the previous age group.
+
+            h6.heading.is-size-6 Life Expectancy at Birth
             p.
               If we add up all the areas of the red blocks (deaths) and divide by 100%, we get the
               expected age an individual would die at (aka: life expectancy from birth).
               <span class="highlight">{{ selectedName | titleCase }}</span> mostly live around
               <span class="highlight">{{longevityStats.expectation.toFixed(0)}} years</span> after birth.
 
+            h6.heading.is-size-6 Life Expectancy After Infancy
             p.
               For some animals, like dogs, we care more how long they're going to live after infancy.
               If we only take into account data after the first year of life, we get the
@@ -45,6 +89,8 @@
 
             p.
               But there's always a chance of beating the odds, right?
+
+            h6.heading.is-size-6 Maximum Life Expectancy
             p.
               The oldest in this dataset is <span class="highlight">{{longevityStats.max.toFixed(0)}} years old</span>,
               but the oldest any <span class="highlight">{{ selectedName | titleCase }}</span>
@@ -85,6 +131,9 @@
               This shows how likely it is for <span class="highlight">{{ selectedName | titleCase }}</span>
               of a particular age to die within a year. That probability is just the number
               of deaths in the next year divided by the number still alive this year.
+              <em>(This may or may not be the same as the next red bar divided by the current green bar
+              from the previous graph. If the bars span more than one year, we extrapolate
+              what they would yearly.)</em>
 
             p.
               Earlier in life, if the chance of death is really high, then it often means the
@@ -110,6 +159,7 @@
 </template>
 
 <script>
+import VueAffixBox from 'vue-affix-box'
 import { bin } from 'd3-array'
 import _throttle from 'lodash/throttle'
 import StackedBarChart from '@/components/StackedBarChart'
@@ -117,15 +167,18 @@ import LifeMeter from '@/components/LifeMeter'
 import ALL_ANIMAL_DATA from '@/data/all'
 import ThumbImages from '@/assets/animal-thumb-map'
 import AnimalSelection from '@/components/AnimalSelection'
+import ResponsiveEmbed from '@/components/ResponsiveEmbed'
 import Footer from '@/pages/Footer'
 
 export default {
   name: 'Home'
   , components: {
-    StackedBarChart
+    VueAffixBox
+    , StackedBarChart
     , LifeMeter
     , AnimalSelection
     , Footer
+    , ResponsiveEmbed
   }
   , data: () => ({
     datasetList: ALL_ANIMAL_DATA
@@ -233,6 +286,8 @@ export default {
 .animal-selector
   background: #fff6e1
   position: relative
+  .is-fixed &
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25)
   &:after
     content: ''
     position: absolute
@@ -316,7 +371,7 @@ export default {
     box-shadow: inset 0 0 0 1000px $start, 0 0 0 0px $start
     border-color: $start
   100%
-    box-shadow: inset 0 0 0 1000px $end, 0 0 0 5px $end
+    box-shadow: inset 0 0 0 1000px $end, 0 0 0 8px $end
     border-color: $end
 
 

@@ -1,11 +1,14 @@
 <template lang="pug">
 #app
-  router-view
+  //- router-view
+  Home
 </template>
 
 <script>
+import Home from '@/pages/home'
 export default {
   name: 'App'
+  , components: { Home }
 }
 </script>
 
