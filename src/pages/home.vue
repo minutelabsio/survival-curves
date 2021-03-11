@@ -13,7 +13,7 @@
               a committed nonconformist) would have given you a number.
             p.
               But sometimes getting numeric answers isn't quite that easy.
-              As Douglas Adams reminded us in the "Hitchiker's Guide to the Galaxy",
+              As Douglas Adams reminded us in the "Hitchhiker's Guide to the Galaxy",
               if you get an answer of 42, you may need to check what the actual
               question was...
             p.
@@ -75,7 +75,7 @@
             h6.heading.is-size-6 Life Expectancy at Birth
             p.
               If we add up all the areas of the red blocks (deaths) and divide by 100%, we get the
-              expected age an individual would die at (aka: life expectancy from birth).
+              expected age an individual would die at (aka: <em>life expectancy at birth</em>).
               <span class="highlight">{{ selectedName | titleCase }}</span> mostly live around
               <span class="highlight">{{longevityStats.expectation.toFixed(0)}} years</span> after birth.
 

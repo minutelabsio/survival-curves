@@ -39,7 +39,7 @@
               have made it without <u>Sarah Berman</u>'s artistic direction and
               drawings, and <u>David Goldenberg</u>'s data research skills.
             p.
-              And as always, this was made possible by ths support of the
+              And as always, this was made possible by the support of the
               <a href="https://minuteearth.com" target="_blank">MinuteEarth team</a>.
 
 
