@@ -28,9 +28,8 @@
               li What is the longest time we know some individual has ever lived?
 
           .column
-            ResponsiveEmbed(:ratio="16/9", :max-width="540")
-              b-message(type="is-primary") Video Pending
-            //- <iframe width="313" height="176" src="https://www.youtube.com/embed/tnIZybxCW1k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            ResponsiveEmbed(:ratio="16/9", :max-width="540").
+              <iframe width="313" height="176" src="https://www.youtube.com/embed/i2qckcs_tmI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
         p.
           So you've got make sure you know which life expectancy is being
