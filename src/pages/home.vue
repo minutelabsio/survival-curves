@@ -103,6 +103,7 @@
             :animate="true",
             :width="plotWidth",
             :series="series",
+            :range="[0, 1]",
             :xvalues="xvalues",
             :barMargin="0.1",
             :tick-format="showPercent ? '%' : null"
@@ -349,6 +350,7 @@ export default {
   text-align: center
   width: 50px
   margin-left: -25px
+  transition: transform 0.35s ease
   .on-axis
     position: absolute
     top: 0

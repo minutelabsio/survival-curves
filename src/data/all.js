@@ -12,6 +12,7 @@ import * as human from './human'
 import * as lapwing from './lapwing'
 import * as robin from './robin'
 import * as turtle from './turtle'
+import * as redWolf from './red-wolf'
 
 export default Object.freeze(_mapValues({
   'Humans': human,
@@ -25,6 +26,7 @@ export default Object.freeze(_mapValues({
   'Lapwings': lapwing,
   'Robins': robin,
   'Loggerhead Sea Turtles': turtle,
+  'Red Wolves': redWolf
 }, d => {
   let ret = allStats(d.default)
   ret.maxLifetime = d.maxLifetime

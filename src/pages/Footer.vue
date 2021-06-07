@@ -48,8 +48,10 @@
             h3.title.is-size-2 Data Sources
             dl.references
               dt Human
-              dd Lifetables from United Nations - &nbsp;
+              dd Lifetables from United Nations -
                 ReferenceLink(url="https://population.un.org/wpp/Download/Standard/Mortality/")
+                div and decade lifetables from &nbsp;
+                ReferenceLink(url="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2885717/")
 
               dt Dog
               dd.
@@ -74,6 +76,10 @@
               dt Cats
               dd
                 ReferenceLink(url="https://www.jstage.jst.go.jp/article/jvms1939/51/5/51_5_905/_pdf")
+
+              dt Red Wolf
+              dd Extrapolated from &nbsp;
+                ReferenceLink(url="https://www.fws.gov/southeast/pdf/report/red-wolf-population-viability-analysis-faust-et-al-2016.pdf")
 
             h3.title.is-size-3 Source Code
             p.

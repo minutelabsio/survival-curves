@@ -1,7 +1,9 @@
 <template lang="pug">
 .lifemeter(:class="{ m: !!labels }", :style="{ width: size + 'px' }")
   transition(name="fade")
-    img.thumb(v-bind="thumbnail", :key="thumb")
+    .thumb(v-bind="thumbnail")
+      slot(name="thumb")
+        img(:src="thumbnail.src", width="100%", :key="thumb")
   b-icon.clock(v-if="labels", icon="timer-sand", :style="iconStyle")
   template(v-if="labels")
     .l.childhood
@@ -19,7 +21,8 @@
         path(v-bind="lifeline")
         text.lifelinetext(v-if="labels", :width="size", dy="-3")
           textPath(alignment-baseline="top", :xlink:href="'#' + uniqueId", startOffset="50%", text-anchor="middle")
-            | {{ deathAge.toFixed(0) }} years ({{ max }} max)
+            | {{ deathAge.toFixed(0) }} years&nbsp;
+            template(v-if="max") ({{ max }} max)
 
       g.dangers
         path(v-bind="early")
@@ -34,12 +37,6 @@ const red = '#D03D49'
 const yellow = '#FDDE3B'
 const green = '#AEE4C9'
 const blue = '#81c9ec'
-
-const riskScale = scaleThreshold()
-  .domain([0.05, 0.20, 0.40])
-  .range([green, blue, yellow,  red])
-
-const riskScaleText = riskScale.copy().range(['safe', 'okay', 'difficult', 'treacherous'])
 
 const lifelineScale = scaleLinear()
   .domain([0, 120])
@@ -87,11 +84,24 @@ export default {
       type: Number
       , default: 30
     }
+    , riskDomain: {
+      type: Array
+      , default: () => [0.05, 0.20, 0.40]
+    }
   }
   , components: {
   }
   , computed: {
-    uniqueId(){ return _uniqueId('lifemeter-') }
+    riskScale(){
+      return scaleThreshold()
+        .domain(this.riskDomain)
+        .range([green, blue, yellow,  red])
+    }
+    , riskScaleText(){
+      return this.riskScale.copy()
+        .range(['safe', 'okay', 'difficult', 'treacherous'])
+    }
+    , uniqueId(){ return _uniqueId('lifemeter-') }
     , lifetable(){ return this.data.lifetable }
     , iconStyle(){
       let r = this.r
@@ -145,39 +155,38 @@ export default {
       let width = this.size - 2 * margin
       return {
         src: this.thumb
-        , width
-        , style: { transform: `translate(${margin}px, ${margin + this.topPad}px)` }
+        , style: { transform: `translate(${margin}px, ${margin + this.topPad}px)`, width: `${width}px`, height: `${width}px` }
       }
     }
     , early(){
       let r = this.r
       return {
         d: wedge(r, r - this.thickness, Math.PI * 3/5, Math.PI * 4/5, r, r)
-        , fill: riskScale(this.data.riskByStage.early)
+        , fill: this.riskScale(this.data.riskByStage.early)
       }
     }
     , earlyText(){
-      return riskScaleText(this.data.riskByStage.early)
+      return this.riskScaleText(this.data.riskByStage.early)
     }
     , mid(){
       let r = this.r
       return {
         d: wedge(r, r - this.thickness, Math.PI * 2/5, Math.PI * 3/5, r, r)
-        , fill: riskScale(this.data.riskByStage.mid)
+        , fill: this.riskScale(this.data.riskByStage.mid)
       }
     }
     , midText(){
-      return riskScaleText(this.data.riskByStage.mid)
+      return this.riskScaleText(this.data.riskByStage.mid)
     }
     , late(){
       let r = this.r
       return {
         d: wedge(r, r - this.thickness, Math.PI * 1/5, Math.PI * 2/5, r, r)
-        , fill: riskScale(this.data.riskByStage.late)
+        , fill: this.riskScale(this.data.riskByStage.late)
       }
     }
     , elderlyText(){
-      return riskScaleText(this.data.riskByStage.late)
+      return this.riskScaleText(this.data.riskByStage.late)
     }
   }
 }

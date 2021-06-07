@@ -1,11 +1,36 @@
 <template lang="pug">
-.home
+.humans
+  .section.upper-section
+    .container
+      .content
+        h1.title.is-size-1 Human Data Over Time<sup>*</sup>
+        .columns
+          .column
+            p.
+              The life meter colors have been rescaled to show contrast between decades.
+            p.
+              <sup>*</sup> Note about data
+
+  vue-affix-box(:offset-top="0")
+    .animal-selector
+      DecadeSelection.sel(@select="selectDecade($event, name)", v-model="selectedName")
   .section
     .container
-      b-field
-        b-select(v-model="selectedName")
-          option(v-for="(d, y) in datasetList", :value="y") {{ y }}
+      .is-flex.is-flex-direction-column.is-align-items-center
+        LifeMeter(:labels="true", :data="selected")
+          template(#thumb)
+            .decade-thumb
+              span {{ selectedName }}'s
       .columns.pad.is-flex-direction-row-reverse.is-desktop
+        .column
+          .content
+            h2.is-size-4.title
+              span.survivors Survival
+              span=" / "
+              span.deaths Death
+
+            p.
+              Lorem Ipsum
         .column.negate-space.center-mobile
           b-field.toggle
             b-switch(v-model="showAlive", :true-value="false", :false-value="true") Only deaths
@@ -14,14 +39,15 @@
             :width="plotWidth",
             :series="series",
             :xvalues="xvalues",
+            :range="[0, 1]",
             :barMargin="0.1",
             :tick-format="showPercent ? '%' : null"
           )
             template(#under="{ xscale }")
-              .poi(:style="{ transform: `translateX(${xscale(longevityStats.max)}px)` }")
-                .on-axis
-                  b-tooltip(:label="`longest living in batch: ${longevityStats.max.toFixed(0)} years`", type="is-light", position="is-bottom", multilined)
-                    .nib
+              //- .poi(:style="{ transform: `translateX(${xscale(longevityStats.max)}px)` }")
+              //-   .on-axis
+              //-     b-tooltip(:label="`longest living in batch: ${longevityStats.max.toFixed(0)} years`", type="is-light", position="is-bottom", multilined)
+              //-       .nib
               .poi(:style="{ transform: `translate(${xscale(longevityStats.afterChildhood)}px, 0)` }")
                 .on-axis
                   b-tooltip(:label="`life expectancy after year 1: ${longevityStats.afterChildhood.toFixed(0)} years`", type="is-light", position="is-bottom", multilined)
@@ -30,10 +56,13 @@
                 .on-axis
                   b-tooltip(:label="`life expectancy: ${longevityStats.expectation.toFixed(0)} years`", type="is-light", position="is-bottom", multilined)
                     .nib
-      //- .content.has-text-centered
-      //-   h2.is-size-3.title Chance of Dying
-
       .columns.pad.is-flex-direction-row-reverse.is-desktop
+        .column
+          .content
+            h2.is-size-4.title Chance of Dying Within a Year
+            p.
+              Lorem Ipsum
+
         .column.center-mobile
           StackedBarChart.chart(
             :width="plotWidth",
@@ -54,7 +83,7 @@ import StackedBarChart from '@/components/StackedBarChart'
 import LifeMeter from '@/components/LifeMeter'
 import DataByYear from '@/data/human-history/all'
 import ThumbImages from '@/assets/animal-thumb-map'
-import AnimalSelection from '@/components/AnimalSelection'
+import DecadeSelection from '@/components/DecadeSelection'
 import ResponsiveEmbed from '@/components/ResponsiveEmbed'
 import Footer from '@/pages/Footer'
 
@@ -64,7 +93,7 @@ export default {
     VueAffixBox
     , StackedBarChart
     , LifeMeter
-    , AnimalSelection
+    , DecadeSelection
     , Footer
     , ResponsiveEmbed
   }
@@ -152,7 +181,7 @@ export default {
     }
   }
   , methods: {
-    selectAnimal(e, name){
+    selectDecade(e, name){
       this.selectedName = name
     }
   }
@@ -237,6 +266,7 @@ export default {
   text-align: center
   width: 50px
   margin-left: -25px
+  transition: transform 0.35s ease
   .on-axis
     position: absolute
     top: 0
@@ -262,5 +292,12 @@ export default {
     box-shadow: inset 0 0 0 1000px $end, 0 0 0 8px $end
     border-color: $end
 
-
+.decade-thumb
+  height: 100%
+  border-radius: 50%
+  font-size: 67px
+  line-height: 3.25
+  text-align: center
+  background: #dad1b7
+  color: darken(#dad1b7, 62)
 </style>

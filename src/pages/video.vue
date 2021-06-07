@@ -43,41 +43,42 @@
 </template>
 
 <script>
-import Home from './home'
+import Home from './humans'
 import { tween } from '@/lib/tween'
-import ALL_ANIMAL_DATA from '@/data/all'
+// import ALL_ANIMAL_DATA from '@/data/all'
+import DataByYear from '@/data/human-history/all'
 
-function addOldest(arr, oldest){
-  let ret = []
-  let age = 0
-  let a = 0
-  for (a = 0; age < oldest && arr[a]; a++){
-    age = arr[a][0]
-    let v = arr[a] ? arr[a][1] : 0
-    ret[a] = [age, v + 1]
-  }
-  age += 5
-  for (; age < oldest; a++){
-    ret.push([age, 1])
-    age += 5
-  }
-  ret.push([age, 1])
-  return ret
-}
+// function addOldest(arr, oldest){
+//   let ret = []
+//   let age = 0
+//   let a = 0
+//   for (a = 0; age < oldest && arr[a]; a++){
+//     age = arr[a][0]
+//     let v = arr[a] ? arr[a][1] : 0
+//     ret[a] = [age, v + 1]
+//   }
+//   age += 5
+//   for (; age < oldest; a++){
+//     ret.push([age, 1])
+//     age += 5
+//   }
+//   ret.push([age, 1])
+//   return ret
+// }
 
-const humans = addOldest(ALL_ANIMAL_DATA["Humans"].lifetable, 120) //122
+// const humans = addOldest(ALL_ANIMAL_DATA["Humans"].lifetable, 120) //122
 
-const datasetList = Object.assign({}, ALL_ANIMAL_DATA, {
-  "Humans": Object.assign({}, ALL_ANIMAL_DATA['Humans'], { lifetable: humans })
-})
+// const datasetList = Object.assign({}, ALL_ANIMAL_DATA, {
+//   "Humans": Object.assign({}, ALL_ANIMAL_DATA['Humans'], { lifetable: humans })
+// })
 
 export default {
   name: 'VideoHelper'
   , extends: Home
   , data: () => ({
     showDead: false
-    , datasetList: Object.freeze(datasetList)
-    , selectedName: 'Humans'
+    , datasetList: Object.freeze(DataByYear)
+    , selectedName: '1810'
 
     , from: 1
     , to: 0.01
