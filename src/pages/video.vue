@@ -8,9 +8,9 @@
       ref="videoChart",
       :width="width",
       :height="1280/(3/2)",
-      :series="series",
+      :series="series.map(a => ({...a, values: a.values.slice(xto)}))",
       :range="videoGraphRange",
-      :xvalues="xvalues",
+      :xvalues="xvalues.slice(xto)",
       :barMargin="0.1",
       tick-format="~%"
     )
@@ -35,17 +35,17 @@
       b-button(@click="reset") Reset
       b-button(@click="zoomIn", type="is-primary") Y axis zoom
 
-    //- b-field(grouped)
-    //-   b-field(label="x to")
-    //-     b-input(type="number", v-model="xto")
-    //-   b-field
-    //-     b-button(@click="zoomX") X axis animate
+    b-field(grouped)
+      b-field(label="x to")
+        b-input(type="number", v-model="xto")
+      b-field
+        b-button(@click="zoomX") X axis animate
 </template>
 
 <script>
 import Home from './humans'
 import { tween } from '@/lib/tween'
-// import ALL_ANIMAL_DATA from '@/data/all'
+import ALL_ANIMAL_DATA from '@/data/all'
 import DataByYear from '@/data/human-history/all'
 
 // function addOldest(arr, oldest){
@@ -77,13 +77,17 @@ export default {
   , extends: Home
   , data: () => ({
     showDead: false
-    , datasetList: Object.freeze(DataByYear)
+    , datasetList: Object.freeze(Object.assign(
+      {},
+      DataByYear,
+      ALL_ANIMAL_DATA
+    ))
     , selectedName: '1810'
 
     , from: 1
     , to: 0.01
 
-    , xto: 122
+    , xto: 0
     , lastX: false
     , width: 1280
     , videoGraphRange: [0, 1]
