@@ -7,7 +7,7 @@
     StackedBarChart.chart(
       ref="videoChart",
       :width="width",
-      :height="1280/(3/2)",
+      :height="width/(3/2)",
       :series="series.map(a => ({...a, values: a.values.slice(xto)}))",
       :range="videoGraphRange",
       :xvalues="xvalues.slice(xto)",
@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import { allStats } from '@/lib/lifespan-stats'
 import Home from './humans'
 import { tween } from '@/lib/tween'
 import ALL_ANIMAL_DATA from '@/data/all'
@@ -80,7 +81,10 @@ export default {
     , datasetList: Object.freeze(Object.assign(
       {},
       DataByYear,
-      ALL_ANIMAL_DATA
+      ALL_ANIMAL_DATA,
+      // {
+      //   zero: {...allStats(Array(110).fill(0).map((x,i) => [i, x])), maxLifetime:0}
+      // }
     ))
     , selectedName: '1810'
 
@@ -89,7 +93,7 @@ export default {
 
     , xto: 0
     , lastX: false
-    , width: 1280
+    , width: 640
     , videoGraphRange: [0, 1]
   })
   , computed: {
