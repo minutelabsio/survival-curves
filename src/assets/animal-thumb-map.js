@@ -10,5 +10,6 @@ export default Object.freeze({
   "Humans": require("./animals/Human.png"),
   "Lapwings": require("./animals/Lapwing.png"),
   "Loggerhead Sea Turtles": require("./animals/Loggerhead-Turtle.png"),
-  "Robins": require("./animals/Robin.png")
+  "Robins": require("./animals/Robin.png"),
+  "Red Wolves": require("./animals/Red-Wolf.png")
 })
