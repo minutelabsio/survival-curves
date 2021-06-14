@@ -46,6 +46,9 @@
           lifespan. The last is the danger through the rest of their possible lifespan up to
           the maximum.
 
+        p.
+          We have also recently added some <router-link :to="{ name: 'humans' }">historical data for a small subset of humans</router-link>.
+
         p Without further ado, here are some animals to choose from...
   vue-affix-box(:offset-top="0")
     .animal-selector
@@ -54,6 +57,7 @@
     .container
       .is-flex.is-flex-direction-column.is-align-items-center
         .heading.title.is-size-2 {{ selectedName }}
+        router-link(:to="{ name: 'humans' }", v-if="selectedName === 'Humans'").human-link.is-size-6 (see more human data)
         LifeMeter(:labels="true", :data="selected", :thumb="selectedThumb")
 
       //- .content.has-text-centered
@@ -134,7 +138,7 @@
               of deaths in the next year divided by the number still alive this year.
               <em>(This may or may not be the same as the next red bar divided by the current green bar
               from the previous graph. If the bars span more than one year, we extrapolate
-              what they would yearly.)</em>
+              what they would be yearly.)</em>
 
             p.
               Earlier in life, if the chance of death is really high, then it often means the
@@ -274,6 +278,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.human-link
+  margin-bottom: 1rem
 .footer,
 .upper-section
   background: rgb(223, 246, 255)

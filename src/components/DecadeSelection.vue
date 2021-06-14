@@ -86,10 +86,10 @@ export default {
   name: 'DecadeSelection'
   , props: [
     'value' // selected animal
+    , 'riskDomain'
   ]
   , data: () => ({
     lifetables: DataByYear
-    , riskDomain: [0.02, 0.075, 0.15]
   })
   , components
   , computed

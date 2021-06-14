@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { allStats } from '@/lib/lifespan-stats'
+import { allStats, riskByStage } from '@/lib/lifespan-stats'
 import _mapValues from 'lodash/mapValues'
 import * as y1810 from './1810'
 import * as y1860 from './1860'
@@ -15,6 +15,7 @@ export default Object.freeze(_mapValues({
   '2010': y2010,
 }, d => {
   let ret = allStats(d.default)
+  ret.riskByStage.late = ret.deathChance.find(a => a[0] == 75)[1]
   ret.maxLifetime = d.maxLifetime
   return ret
 }))

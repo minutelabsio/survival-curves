@@ -7,17 +7,39 @@
         .columns
           .column
             p.
-              The life meter colors have been rescaled to show contrast between decades.
+              (If you haven't seen the <router-link :to="{ name: 'home' }">animal data yet, start with that!</router-link>)
             p.
-              <sup>*</sup> Note about data
+              As David describes in this follow up video, getting data for humans
+              across different decades is a bit tricky. But there are some interesting
+              things to be seen nonetheless.
+
+            p.
+              One particularly interesting feature that wasn't mentioned in the video
+              is the increase of deaths the 1860's for men in their 20's and 30's. You can see this clearly
+              by toggling the "Only Deaths" switch and looking at how the red bars
+              change between 1810 and 1860. This is due to the american civil war
+              causing a lot of those deaths.
+
+            p.
+              The life meter colors have been rescaled to show contrast between decades.
+              To get an acurate measure of old age with varied data points, we are comparing
+              the yearly death risk at age 75 for the old age color bar.
+
+          .column
+            ResponsiveEmbed(:ratio="16/9", :max-width="540").
+              <iframe width="313" height="176" src="https://www.youtube.com/embed/i2qckcs_tmI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        p
+          em.
+            <sup>*</sup> This historical data is specific to a small subset of humans
+            for which we could get data; white US males.
 
   vue-affix-box(:offset-top="0")
     .animal-selector
-      DecadeSelection.sel(@select="selectDecade($event, name)", v-model="selectedName")
+      DecadeSelection.sel(@select="selectDecade($event, name)", v-model="selectedName", :riskDomain="riskDomain")
   .section
     .container
       .is-flex.is-flex-direction-column.is-align-items-center
-        LifeMeter(:labels="true", :data="selected")
+        LifeMeter(:labels="true", :data="selected", :riskDomain="riskDomain")
           template(#thumb)
             .decade-thumb
               span {{ selectedName }}'s
@@ -30,7 +52,29 @@
               span.deaths Death
 
             p.
-              Lorem Ipsum
+              Every <span class="survivors">green block</span> shows the fraction of individuals that are still alive
+              when they reach that age. The <span class="deaths">red blocks</span> show the fraction
+              that died since the previous age group.
+
+            h6.heading.is-size-6 Life Expectancy at Birth
+            p.
+              If we add up all the areas of the red blocks (deaths) and divide by 100%, we get the
+              expected age an individual would die at (aka: <em>life expectancy at birth</em>).
+              In <span class="highlight">{{ selectedName | titleCase }}</span> the life expectancy is around
+              <span class="highlight">{{longevityStats.expectation.toFixed(0)}} years</span> after birth.
+
+            h6.heading.is-size-6 Life Expectancy After Infancy
+            p.
+              For some animals, like dogs, we care more how long they're going to live after infancy.
+              If we only take into account data after the first year of life, we get the
+              <em>life expectancy after infancy</em>. In <span class="highlight">{{ selectedName | titleCase }}</span>
+              those who have succesfully lived a year after birth will likely live to be around
+              <span class="highlight">{{longevityStats.afterChildhood.toFixed(0)}} years old</span>.
+
+            p.
+              You can see that in recent years, this value is very close to the life expectancy
+              at birth because we're getting better at preventing newborns from dying.
+
         .column.negate-space.center-mobile
           b-field.toggle
             b-switch(v-model="showAlive", :true-value="false", :false-value="true") Only deaths
@@ -61,7 +105,16 @@
           .content
             h2.is-size-4.title Chance of Dying Within a Year
             p.
-              Lorem Ipsum
+              This shows how likely it is in <span class="highlight">{{ selectedName | titleCase }}</span>
+              for a person of a particular age to die within a year. That probability is just the number
+              of deaths in the next year divided by the number still alive this year.
+              <em>(This may or may not be the same as the next red bar divided by the current green bar
+              from the previous graph. If the bars span more than one year, we extrapolate
+              what they would be yearly.)</em>
+
+            p.
+              For some decades, the data for later years is sparse and so the risk of death
+              is hard to estimate. Above age 75 or so, don't count on this value being accurate.
 
         .column.center-mobile
           StackedBarChart.chart(
@@ -106,6 +159,8 @@ export default {
 
     , showDead: true
     , showAlive: true
+
+    , riskDomain: [0.01, 0.075, 0.15]
   })
   , mounted(){
     const onResize = _throttle(() => {

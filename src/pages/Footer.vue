@@ -50,8 +50,22 @@
               dt Human
               dd Lifetables from United Nations -
                 ReferenceLink(url="https://population.un.org/wpp/Download/Standard/Mortality/")
-                div and decade lifetables from &nbsp;
+
+              dt Human decades (1810, 1860)
+              dd Table 8 -
                 ReferenceLink(url="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2885717/")
+
+              dt Human decade (1910)
+              dd Table 9 -
+                ReferenceLink(url="https://www.cdc.gov/nchs/data/lifetables/life1890-1910.pdf")
+
+              dt Human decade (1960)
+              dd Table 5 -
+                ReferenceLink(url="https://www.cdc.gov/nchs/data/lifetables/life59-61_1_1acc.pdf")
+
+              dt Human decade (2010)
+              dd Table 5 -
+                ReferenceLink(url="https://www.cdc.gov/nchs/data/nvsr/nvsr63/nvsr63_07.pdf")
 
               dt Dog
               dd.

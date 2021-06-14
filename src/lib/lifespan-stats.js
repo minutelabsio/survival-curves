@@ -51,8 +51,8 @@ export function deathChance(data, max){
     .filter(v => v[0] < max - 1)
 }
 
-export function riskByStage(deathChances){
-  let cutoff = Math.round(deathChances.length * 0.6)
+export function riskByStage(deathChances, cutoff){
+  cutoff = cutoff || Math.round(deathChances.length * 0.6)
   let midlife = deathChances.slice(1, cutoff)
   let latelife = deathChances.slice(cutoff)
   return {
