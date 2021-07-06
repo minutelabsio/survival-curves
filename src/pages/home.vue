@@ -47,7 +47,7 @@
           the maximum.
 
         p.
-          We have also recently added some <router-link :to="{ name: 'humans' }">historical data for a small subset of humans</router-link>.
+          We have also added some <router-link :to="{ name: 'humans' }">historical data for a small subset of humans</router-link>.
 
         p Without further ado, here are some animals to choose from...
   vue-affix-box(:offset-top="0")

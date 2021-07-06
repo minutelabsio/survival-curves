@@ -27,7 +27,7 @@
 
           .column
             ResponsiveEmbed(:ratio="16/9", :max-width="540").
-              <iframe width="313" height="176" src="https://www.youtube.com/embed/i2qckcs_tmI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              <iframe width="313" height="176" src="https://www.youtube.com/embed/c_ADG3Qc6rI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         p
           em.
             <sup>*</sup> This historical data is specific to a small subset of humans
@@ -353,6 +353,6 @@ export default {
   font-size: 67px
   line-height: 3.25
   text-align: center
-  background: #dad1b7
-  color: darken(#dad1b7, 62)
+  background: #d4ac9f
+  color: darken(#d4ac9f, 62)
 </style>

@@ -137,6 +137,6 @@ $height: 110px
   font-size: 19px
   line-height: 3.1
   text-align: center
-  background: #dad1b7
-  color: darken(#dad1b7, 62)
+  background: #d4ac9f
+  color: darken(#d4ac9f, 62)
 </style>
