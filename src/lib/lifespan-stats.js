@@ -5,6 +5,15 @@ import _uniqBy from 'lodash/uniqBy'
 import _meanBy from 'lodash/meanBy'
 import interpolator from '@/lib/interpolator'
 
+function assertMonotonic(data){
+  let prev = data[0][1]
+  for (let i = 1, l = data.length; i < l; i++){
+    let x = data[i][1]
+    if (x > prev){ throw new Error(`Error: lifetable data is not monotonic at age ${data[i][0]} (${x})`) }
+    prev = x
+  }
+}
+
 export function calcDeaths(data){
   return data.map((v, i) => [v[0], i ? data[i - 1][1] - v[1] : 0])
 }
@@ -30,6 +39,7 @@ export function getDeathChance(v, i, arr) {
 }
 
 export function longevityStats(data){
+  assertMonotonic(data)
   let expectation = calcDeathAgeExpectation(data)
   let afterChildhood = calcDeathAgeExpectation(data.filter(a => a[0] > 1))
   let max = _findLast(data, a => a[1] > 0)[0]
